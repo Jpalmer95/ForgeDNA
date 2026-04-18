@@ -1,0 +1,71 @@
+{
+  "$schema": "game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "_comment": "High-level game identity and metadata.",
+    "title": "My Game",
+    "tagline": "A short catchy description of your game",
+    "description": "Write 2-5 paragraphs describing your game vision, core loop, and what makes it unique.",
+    "genre": ["rpg"],
+    "_comment_genre": "Options: rpg, mmorpg, action, adventure, platformer, puzzle, strategy, simulation, survival, roguelike, fps, tps, horror, racing, sports, sandbox, visual_novel, tower_defense, metroidvania, soulslike, battle_royale, moba, card_game, rhythm, stealth, immersive_sim, open_world",
+    "art_style": "pixel_art_2d",
+    "_comment_art_style": "Options: realistic, stylized, pixel_art_2d, pixel_art_3d, low_poly, cel_shaded, hand_painted, voxel, retro_16bit, retro_8bit, minimalist, watercolor, comic_book, anime, photorealistic, abstract, paper_cutout, claymation, ink_brush",
+    "target_platforms": ["pc"],
+    "player_count": { "min": 1, "max": 1, "mode": "singleplayer" },
+    "rating": "everyone",
+    "tags": ["placeholder"],
+    "inspiration": []
+  },
+
+  "mechanics": {
+    "_comment": "Define core gameplay mechanics. Remove sections you don't need.",
+    "movement": {
+      "types": ["walk", "run", "jump"],
+      "physics_style": "snappy"
+    },
+    "combat": {
+      "style": "action_rpg",
+      "damage_types": ["physical"],
+      "weapon_categories": [
+        { "name": "Sword", "damage_type": "physical", "range": "melee", "speed": "normal", "description": "Basic melee weapon." }
+      ],
+      "status_effects": []
+    },
+    "progression": {
+      "type": "level_based",
+      "max_level": 50
+    }
+  },
+
+  "world": {
+    "_comment": "Define the game world. At least one environment is required.",
+    "scale": "small",
+    "structure": "level_based",
+    "environments": [
+      {
+        "_comment": "Fill in your first environment here.",
+        "name": "Starting Zone",
+        "type": "plains",
+        "visual_description": "Describe the visual look in detail — colors, mood, lighting, key features.",
+        "audio_mood": "Describe the audio atmosphere."
+      }
+    ]
+  },
+
+  "entities": {
+    "_comment": "Define player, enemies, NPCs, and items.",
+    "player": {
+      "visual_description": "Describe the player character appearance.",
+      "stats": ["health", "stamina"]
+    },
+    "enemies": [
+      {
+        "name": "Basic Enemy",
+        "type": "normal",
+        "description": "A simple enemy to fight.",
+        "behavior": "aggressive"
+      }
+    ]
+  }
+}

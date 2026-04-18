@@ -1,0 +1,126 @@
+{
+  "$schema": "game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "_comment": "Puzzle game metadata. Focus on mechanics and level design.",
+    "title": "My Puzzle Game",
+    "tagline": "Think outside the box — literally",
+    "description": "Describe your puzzle game — the core mechanic, theme, difficulty curve, and what makes puzzles satisfying to solve.",
+    "genre": ["puzzle"],
+    "art_style": "minimalist",
+    "_comment_art_style": "minimalist, stylized, or pixel_art_2d work well for puzzle games.",
+    "target_platforms": ["pc", "web", "android", "ios"],
+    "player_count": { "min": 1, "max": 1, "mode": "singleplayer" },
+    "rating": "everyone",
+    "tags": ["puzzle", "relaxing", "brain-teaser", "zen"],
+    "inspiration": ["Baba Is You", "The Witness", "Portal", "Tetris"]
+  },
+
+  "mechanics": {
+    "_comment": "Custom mechanics are the heart of puzzle games. Define your unique rules here.",
+    "movement": {
+      "types": ["walk"],
+      "physics_style": "snappy"
+    },
+    "custom_mechanics": [
+      {
+        "_comment": "Define the core puzzle mechanic here. This is what makes your game unique.",
+        "name": "Block Pushing",
+        "description": "Push blocks onto target tiles to solve each level. Blocks can only be pushed, not pulled. Some blocks have special properties.",
+        "rules": [
+          "Push blocks by walking into them.",
+          "Blocks slide until they hit a wall or another block.",
+          "Heavy blocks require two pushes in sequence.",
+          "Magnetic blocks attract or repel each other.",
+          "Ice blocks slide until hitting a wall."
+        ],
+        "interactions": [
+          "Blocks can activate pressure plates.",
+          "Blocks can block laser beams.",
+          "Stacked blocks create platforms."
+        ]
+      },
+      {
+        "name": "Color Matching",
+        "description": "Some blocks and tiles are colored. Matching colors creates interactions.",
+        "rules": [
+          "Red blocks activate red switches.",
+          "Mixed colors create new interactions.",
+          "Color changes propagate through connected blocks."
+        ],
+        "interactions": [
+          "Red + Blue = Purple (activates both switch types).",
+          "Matching block to target tile completes the level."
+        ]
+      }
+    ]
+  },
+
+  "world": {
+    "_comment": "For puzzle games, environments are more like level themes/worlds.",
+    "scale": "small",
+    "structure": "level_based",
+    "environments": [
+      {
+        "name": "Tutorial Garden",
+        "type": "plains",
+        "visual_description": "A peaceful garden with simple grid floors and soft green colors. Flowers mark the goal areas. Clean, inviting, low-pressure environment.",
+        "audio_mood": "Gentle ambient music, soft wind chimes, birds chirping.",
+        "sub_areas": [
+          { "name": "Basics", "description": "Learn to push blocks onto targets." },
+          { "name": "Sliding", "description": "Blocks that slide until hitting walls." }
+        ]
+      },
+      {
+        "name": "Color Laboratory",
+        "type": "futuristic",
+        "visual_description": "A sterile lab environment with glowing neon panels. Each section has a dominant color. Grid floors with light-up tiles.",
+        "audio_mood": "Electronic ambient hum, soft beeps, synthesized tones.",
+        "sub_areas": [
+          { "name": "Primary Colors", "description": "Learn red, blue, yellow mechanics." },
+          { "name": "Color Mixing", "description": "Combine colors to create new interactions." }
+        ]
+      },
+      {
+        "name": "Frozen Vault",
+        "type": "tundra",
+        "visual_description": "Ice-themed puzzles with slippery floors. Cool blue palette with crystal and frost visual effects.",
+        "audio_mood": "Crystalline echoes, gentle wind, deep reverb.",
+        "sub_areas": [
+          { "name": "Ice Basics", "description": "Blocks slide on ice indefinitely until hitting walls." },
+          { "name": "Thaw Puzzles", "description": "Heat sources melt ice paths to create new routes." }
+        ]
+      }
+    ]
+  },
+
+  "entities": {
+    "_comment": "Puzzle games may have minimal entities. The player is often simple.",
+    "player": {
+      "visual_description": "Simple geometric shape or small character. Clear and readable on the puzzle grid.",
+      "stats": [],
+      "abilities": [
+        { "name": "Push", "description": "Push adjacent blocks by moving into them.", "cooldown_seconds": 0, "resource_cost": "none" },
+        { "name": "Reset", "description": "Reset the current puzzle to its starting state.", "cooldown_seconds": 0, "resource_cost": "none" }
+      ]
+    },
+    "enemies": []
+  },
+
+  "logic": {
+    "_comment": "For puzzle games, levels/quests define the puzzle progression.",
+    "quests": [
+      { "name": "Learn to Push", "type": "main_story", "description": "Complete the first 5 tutorial puzzles.", "steps": [
+        { "order": 1, "description": "Push the block onto the target.", "objective_type": "solve_puzzle" },
+        { "order": 2, "description": "Push two blocks onto two targets.", "objective_type": "solve_puzzle" },
+        { "order": 3, "description": "Navigate around walls to reach the target.", "objective_type": "solve_puzzle" }
+      ], "rewards": { "unlock": "Color Laboratory" } },
+      { "name": "Color Master", "type": "main_story", "description": "Complete all Color Laboratory puzzles.", "steps": [
+        { "order": 1, "description": "Solve the first color puzzle.", "objective_type": "solve_puzzle" },
+        { "order": 2, "description": "Mix colors for the first time.", "objective_type": "solve_puzzle" },
+        { "order": 3, "description": "Complete the final color mixing puzzle.", "objective_type": "solve_puzzle" }
+      ], "rewards": { "unlock": "Frozen Vault" } }
+    ]
+  }
+}

@@ -102,16 +102,92 @@ python -c "import jsonschema; import json; schema=json.load(open('schema/game_dn
 # Or use any online JSON Schema validator with draft-07 support
 ```
 
+## The CLI Tool (`forgedna`)
+
+A Python CLI for working with GameDNA schemas.
+
+### Installation
+```bash
+cd cli
+pip install -e .
+```
+
+### Commands
+| Command | Description |
+|---------|-------------|
+| `forgedna validate <file>` | Validate against schema |
+| `forgedna init [--template rpg]` | Create new from template |
+| `forgedna remix <file>` | Fork with lineage metadata |
+| `forgedna info <file>` | Show summary statistics |
+| `forgedna diff <file1> <file2>` | Compare two DNA files |
+| `forgedna list-templates` | List built-in templates |
+| `forgedna export --format summary` | Export as markdown |
+| `forgedna export --format prompt` | Export as AI agent prompt |
+
+## The Community Hub (`hub/`)
+
+A Gradio web app for browsing, editing, and remixing GameDNA schemas.
+
+### Running Locally
+```bash
+cd hub
+pip install -r requirements.txt
+python app.py
+# Opens at http://localhost:7860
+```
+
+### Features
+- Browse and filter game DNA files
+- Visual form-based JSON editor with live validation
+- Remix any DNA file with one click
+- Upload/download game_dna.json files
+- HF Storage integration (optional — set `HF_TOKEN` and `FORGEDNA_HUB_REPO`)
+
+## The Substrate Harness (`harness/`)
+
+The agentic build pipeline that turns GameDNA schemas into games. Decomposes a game design into parallelizable tasks and orchestrates AI agents to generate all assets, code, and content.
+
+### Installation
+```bash
+cd harness
+pip install -e .
+```
+
+### Commands
+| Command | Description |
+|---------|-------------|
+| `forgedna-harness parse <file>` | Parse and show DNA structure |
+| `forgedna-harness plan <file>` | Generate build plan (task DAG) |
+| `forgedna-harness stat <file>` | Detailed content inventory + build estimate |
+| `forgedna-harness dry-run <file>` | Simulate full build pipeline |
+| `forgedna-harness agents` | List all agent types and capabilities |
+| `forgedna-harness prompt <file> <task_id>` | Generate agent prompt for a task |
+
+### Agent Types (17 total)
+- **Asset:** 3D Generator, Texture Generator, Animation Generator, VFX Generator
+- **Audio:** Music Generator, SFX Generator, Ambient Generator, Voice Generator
+- **Code:** Player Controller, Enemy AI, Combat System, Quest System, Crafting, UI, World Building
+- **Pipeline:** Assembly Agent, Test Agent
+
+### How It Works
+1. **Parse** — Reads game_dna.json and extracts all buildable content
+2. **Decompose** — Breaks into a DAG of ~24-84+ tasks (depending on game complexity)
+3. **Orchestrate** — Dispatches tasks to specialized agents, respecting dependencies
+4. **Assemble** — Integration agent wires everything together
+5. **Test** — Automated validation of the built game
+
 ---
 
-## 🛠️ Repository Structure
+## Repository Structure
 
-Because this is a full-stack monorepo, it contains both the frontend Hub and the backend Substrate:
 * `schema/` — The formal JSON Schema definition for game_dna.json files.
-* `examples/` — Example GameDNA files ranging from simple to complex.
-* `Schema-Builder/artifacts/forge-dna/` - The React/Vite Frontend for the Community Hub.
-* `Schema-Builder/artifacts/api-server/` - The Express API Server and PostgreSQL backend.
-* `Schema-Builder/artifacts/forge-substrate/` - The headless Godot Docker container / MCP Server.
+* `examples/` — Example GameDNA files (Echoes of Aethermoor, Pixel Drift, Quiet Hollow).
+* `cli/` — The `forgedna` CLI tool for schema validation, creation, and export.
+* `hub/` — The Community Hub — Gradio web app for browsing, editing, and remixing.
+* `harness/` — The Substrate Harness — agentic build pipeline (17 agent types, task DAG orchestrator).
+* `Schema-Builder/artifacts/forge-dna/` - The React/Vite Frontend for the Community Hub (planned).
+* `Schema-Builder/artifacts/api-server/` - The Express API Server and PostgreSQL backend (planned).
+* `Schema-Builder/artifacts/forge-substrate/` - The headless Godot Docker container / MCP Server (planned).
 
 ## 🤝 Contributing
 ForgeDNA is entirely open source! Pull requests are welcomed to improve the standard `game_dna.json` schema layout or to augment the ForgeSubstrate with new tools and export capabilities.

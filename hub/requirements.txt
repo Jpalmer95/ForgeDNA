@@ -1,0 +1,5 @@
+gradio>=5.0
+jsonschema
+huggingface_hub
+rich
+deepdiff

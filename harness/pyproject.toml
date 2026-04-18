@@ -1,0 +1,23 @@
+[project]
+name = "forgedna-harness"
+version = "0.1.0"
+description = "Substrate Harness — Agentic game build pipeline from GameDNA schemas"
+license = "Apache-2.0"
+requires-python = ">=3.10"
+dependencies = [
+    "typer",
+    "pyyaml",
+    "rich",
+    "jsonschema",
+    "networkx",
+]
+
+[project.scripts]
+forgedna-harness = "harness.cli:app"
+
+[tool.setuptools.packages.find]
+include = ["harness*"]
+
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"

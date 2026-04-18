@@ -1,0 +1,196 @@
+{
+  "$schema": "game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "_comment": "RPG-focused metadata with progression and class systems.",
+    "title": "My RPG",
+    "tagline": "Forge your legend in a world of magic and steel",
+    "description": "Describe your RPG vision — world lore, main conflict, player role, and what makes it unique.",
+    "genre": ["rpg"],
+    "art_style": "stylized",
+    "target_platforms": ["pc", "mac", "linux"],
+    "player_count": { "min": 1, "max": 1, "mode": "singleplayer" },
+    "rating": "teen",
+    "tags": ["fantasy", "rpg", "exploration", "crafting"],
+    "inspiration": ["The Witcher 3", "Skyrim", "Baldur's Gate 3"]
+  },
+
+  "mechanics": {
+    "movement": {
+      "types": ["walk", "run", "sprint", "sneak", "jump", "dodge", "roll"],
+      "physics_style": "snappy",
+      "mounts_vehicles": [
+        { "name": "Warhorse", "type": "ground", "speed": "fast", "description": "A loyal steed for overland travel." }
+      ]
+    },
+    "combat": {
+      "style": "action_rpg",
+      "damage_types": ["physical_slash", "physical_pierce", "physical_blunt", "fire", "ice", "holy", "shadow"],
+      "defense_types": ["plate_armor", "leather_armor", "cloth_armor"],
+      "weapon_categories": [
+        { "name": "Swords", "damage_type": "physical_slash", "range": "melee", "speed": "normal", "description": "Versatile slashing weapons." },
+        { "name": "Bows", "damage_type": "physical_pierce", "range": "long", "speed": "normal", "description": "Ranged precision weapons." },
+        { "name": "Staves", "damage_type": "fire", "range": "medium", "speed": "slow", "description": "Magical channeling weapons." },
+        { "name": "Axes", "damage_type": "physical_blunt", "range": "melee", "speed": "slow", "description": "Heavy hitting weapons with cleave." }
+      ],
+      "status_effects": [
+        { "name": "Bleed", "element": "physical", "effect": "Deals damage over time.", "duration_type": "timed" },
+        { "name": "Burn", "element": "fire", "effect": "Fire damage over time.", "duration_type": "timed" },
+        { "name": "Freeze", "element": "ice", "effect": "Slows movement and attack speed.", "duration_type": "timed" },
+        { "name": "Poison", "element": "nature", "effect": "Reduces healing and deals damage.", "duration_type": "stacking" }
+      ]
+    },
+    "crafting": {
+      "enabled": true,
+      "professions": ["Blacksmithing", "Alchemy", "Enchanting", "Cooking"],
+      "gathering_skills": ["Mining", "Herbalism", "Skinning", "Logging"],
+      "complexity": "moderate"
+    },
+    "progression": {
+      "type": "class_based",
+      "max_level": 60,
+      "skill_trees": [
+        { "name": "Warrior", "description": "Strength, defense, and melee combat.", "node_count_estimate": 30 },
+        { "name": "Mage", "description": "Arcane spells and elemental magic.", "node_count_estimate": 30 },
+        { "name": "Ranger", "description": "Ranged combat and survival skills.", "node_count_estimate": 25 }
+      ],
+      "respec_available": true
+    },
+    "economy": {
+      "enabled": true,
+      "currencies": [
+        { "name": "Gold", "type": "primary", "description": "Standard currency." }
+      ],
+      "player_trading": true,
+      "auction_house": false,
+      "player_owned_shops": false
+    }
+  },
+
+  "world": {
+    "scale": "large",
+    "structure": "open_world",
+    "day_night_cycle": true,
+    "weather_system": ["clear", "rain", "storm", "fog", "snow"],
+    "time_of_day_effects": true,
+    "environments": [
+      {
+        "name": "Kingdom Heartlands",
+        "type": "plains",
+        "visual_description": "Rolling green farmland and meadows dotted with small villages. A large walled city serves as the capital. Color palette: lush greens, warm stone, golden wheat fields.",
+        "audio_mood": "Peaceful village sounds, distant church bells, birdsong, wind through grass.",
+        "min_level": 1,
+        "max_level": 20,
+        "sub_areas": [
+          { "name": "Capital City", "description": "Walled city with markets, castle, guild halls, and arena." },
+          { "name": "Farmlands", "description": "Scattered villages with simple quests and farming areas." },
+          { "name": "Old Forest", "description": "Dense woodland hiding ancient ruins and bandit camps." }
+        ],
+        "resources": ["Iron Ore", "Wheat", "Herbs", "Wood"],
+        "factions_present": ["Royal Guard", "Merchant Guild", "Farmers' Collective"]
+      },
+      {
+        "name": "Frostpeak Mountains",
+        "type": "mountains",
+        "visual_description": "Towering snow-capped mountain range with frozen caves and dwarven ruins. Harsh winds and blizzards. Color palette: white, ice blue, granite grey.",
+        "audio_mood": "Howling wind, cracking ice, distant avalanche rumbles.",
+        "min_level": 20,
+        "max_level": 40,
+        "sub_areas": [
+          { "name": "Dwarven Hold", "description": "Underground city with best smithing facilities." },
+          { "name": "Glacier Caves", "description": "Ice caves with puzzles and frozen enemies." },
+          { "name": "Dragon's Peak", "description": "Summit where the ancient dragon lairs." }
+        ],
+        "resources": ["Frost Iron", "Ice Crystals", "Dragon Scales"],
+        "factions_present": ["Dwarven Clan", "Ice Barbarians"]
+      }
+    ],
+    "dungeons": [
+      {
+        "name": "The Sunken Crypt",
+        "difficulty": "normal",
+        "player_count": { "min": 1, "max": 4 },
+        "visual_description": "Ancient tomb flooded with murky water. Skeletons and undead lurk in the darkness. Torch-lit corridors with traps.",
+        "floors": 3,
+        "boss_encounters": [
+          { "name": "The Crypt Lord", "description": "An ancient undead king wielding dark magic.", "mechanics": ["Summons skeleton adds", "Dark energy projectiles", "Phase transitions at 50% HP"], "phases": 2 }
+        ],
+        "traps": ["Pitfall traps", "Poison darts", "Swinging blades"],
+        "puzzles": ["Push tomb blocks to open gates", "Light torches in correct order"],
+        "loot_tier": "rare",
+        "elemental_affinity": ["shadow"]
+      },
+      {
+        "name": "Dragon's Lair",
+        "difficulty": "very_hard",
+        "player_count": { "min": 2, "max": 4 },
+        "visual_description": "Massive cavern filled with gold, bones, and molten rock. The dragon perches atop a mountain of treasure.",
+        "floors": 1,
+        "boss_encounters": [
+          { "name": "Frostwyrm", "description": "An ancient ice dragon.", "mechanics": ["Ice breath cone attack", "Tail sweep knocks back", "Flying phase — ranged only", "Rage mode below 25%"], "phases": 3 }
+        ],
+        "traps": ["Ice patches", "Falling icicles"],
+        "puzzles": [],
+        "loot_tier": "legendary",
+        "elemental_affinity": ["ice"]
+      }
+    ]
+  },
+
+  "entities": {
+    "player": {
+      "visual_description": "Customizable humanoid adventurer with visible equipment.",
+      "customization": { "body_types": ["slim", "athletic", "stocky"], "facial_features": true, "hair_styles": 20, "skin_colors": 10, "equipment_visibility": true },
+      "stats": ["health", "mana", "stamina", "strength", "agility", "intellect"],
+      "abilities": [
+        { "name": "Power Strike", "description": "A powerful melee attack.", "cooldown_seconds": 5, "resource_cost": "10 stamina" },
+        { "name": "Heal", "description": "Restore health.", "cooldown_seconds": 15, "resource_cost": "20 mana" },
+        { "name": "Fireball", "description": "Ranged fire spell.", "cooldown_seconds": 8, "resource_cost": "15 mana" }
+      ]
+    },
+    "npcs": [
+      { "name": "Village Elder", "role": "quest_giver", "description": "Wise old leader who sends adventurers on quests.", "dialogue_complexity": "branching" },
+      { "name": "Blacksmith", "role": "craftsman", "description": "Can repair and craft weapons and armor.", "dialogue_complexity": "simple" },
+      { "name": "Merchant", "role": "merchant", "description": "Buys and sells goods.", "dialogue_complexity": "simple" }
+    ],
+    "enemies": [
+      { "name": "Goblin", "type": "normal", "description": "Small green humanoid that attacks in groups.", "level_range": { "min": 1, "max": 10 }, "abilities": ["Stab", "Throw Rock"], "weaknesses": ["fire"], "behavior": "pack" },
+      { "name": "Skeleton Warrior", "type": "normal", "description": "Undead warrior with sword and shield.", "level_range": { "min": 8, "max": 20 }, "abilities": ["Slash", "Shield Block"], "weaknesses": ["holy"], "resistances": ["physical"], "behavior": "territorial" },
+      { "name": "Wraith", "type": "elite", "description": "Floating ghostly entity that phases through walls.", "level_range": { "min": 15, "max": 30 }, "abilities": ["Life Drain", "Phase", "Fear"], "weaknesses": ["holy"], "resistances": ["physical"], "behavior": "ambush" },
+      { "name": "Frostwyrm", "type": "boss", "description": "Ancient ice dragon.", "level_range": { "min": 40, "max": 40 }, "abilities": ["Ice Breath", "Tail Sweep", "Wing Buffet", "Blizzard"], "weaknesses": ["fire"], "resistances": ["ice"], "behavior": "aggressive" }
+    ],
+    "items": {
+      "rarity_tiers": [
+        { "name": "Common", "color_hex": "#9d9d9d", "drop_rate_weight": 100 },
+        { "name": "Uncommon", "color_hex": "#1eff00", "drop_rate_weight": 50 },
+        { "name": "Rare", "color_hex": "#0070dd", "drop_rate_weight": 15 },
+        { "name": "Epic", "color_hex": "#a335ee", "drop_rate_weight": 5 },
+        { "name": "Legendary", "color_hex": "#ff8000", "drop_rate_weight": 1 }
+      ],
+      "equipment_slots": ["head", "chest", "legs", "boots", "main_hand", "off_hand", "ring", "amulet"],
+      "categories": [
+        { "name": "Weapons", "description": "All weapon types.", "examples": ["Iron Sword", "Longbow", "Fire Staff"] },
+        { "name": "Armor", "description": "Protective gear.", "examples": ["Chain Mail", "Leather Boots", "Mage Robes"] },
+        { "name": "Consumables", "description": "Potions and food.", "examples": ["Health Potion", "Mana Potion", "Bread"] }
+      ],
+      "enchanting_system": { "enabled": true, "description": "Enchant gear with elemental properties and stat bonuses." }
+    }
+  },
+
+  "logic": {
+    "quests": [
+      { "name": "The Lost Village", "type": "main_story", "description": "Investigate why the village of Millbrook went silent.", "level_requirement": 1, "steps": [
+        { "order": 1, "description": "Travel to Millbrook.", "objective_type": "explore" },
+        { "order": 2, "description": "Question the survivors.", "objective_type": "talk_to" },
+        { "order": 3, "description": "Clear the goblins from the caves.", "objective_type": "kill" },
+        { "order": 4, "description": "Report back to the Elder.", "objective_type": "talk_to" }
+      ], "rewards": { "xp": 200, "gold": 50, "items": ["Iron Sword"] }, "branching": false },
+      { "name": "The Dragon's Price", "type": "main_story", "description": "Prepare to confront the Frostwyrm.", "level_requirement": 35, "prerequisites": ["The Lost Village"], "steps": [
+        { "order": 1, "description": "Gather the Dragon Slayer sword fragments.", "objective_type": "collect" },
+        { "order": 2, "description": "Have the blacksmith reforge the sword.", "objective_type": "craft" },
+        { "order": 3, "description": "Confront the Frostwyrm in its lair.", "objective_type": "kill" }
+      ], "rewards": { "xp": 5000, "items": ["Frostwyrm Scale Armor"], "unlock": "Dragon Riding" }, "branching": true }
+    ]
+  }
+}

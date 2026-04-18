@@ -1,0 +1,115 @@
+{
+  "$schema": "game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "_comment": "2D platformer metadata. Focus on movement and level design.",
+    "title": "My Platformer",
+    "tagline": "Jump, dash, and wall-jump through challenging levels",
+    "description": "Describe your platformer — theme, setting, main character, and what makes the platforming unique.",
+    "genre": ["platformer"],
+    "art_style": "pixel_art_2d",
+    "_comment_art_style": "pixel_art_2d, retro_16bit, retro_8bit, minimalist, or hand_painted work well for platformers.",
+    "target_platforms": ["pc", "web"],
+    "player_count": { "min": 1, "max": 1, "mode": "singleplayer" },
+    "rating": "everyone",
+    "tags": ["platformer", "2d", "challenging", "speedrun"],
+    "inspiration": ["Celeste", "Hollow Knight", "Super Meat Boy"]
+  },
+
+  "mechanics": {
+    "movement": {
+      "_comment": "Movement is the heart of a platformer. Define all available moves.",
+      "types": ["walk", "run", "jump", "double_jump", "wall_jump", "dash", "climb"],
+      "physics_style": "snappy"
+    },
+    "combat": {
+      "_comment": "Remove this section entirely if your platformer has no combat.",
+      "style": "action_rpg",
+      "damage_types": ["physical"],
+      "weapon_categories": [
+        { "name": "Sword", "damage_type": "physical", "range": "melee", "speed": "fast", "description": "Basic attack." }
+      ],
+      "status_effects": []
+    },
+    "progression": {
+      "type": "metroidvania",
+      "_comment_progression": "Use 'metroidvania' if abilities unlock new areas, or 'level_based' for linear progression."
+    }
+  },
+
+  "world": {
+    "scale": "medium",
+    "structure": "level_based",
+    "_comment_structure": "For platformers: 'level_based' for discrete stages, 'metroidvania' for interconnected world.",
+    "environments": [
+      {
+        "name": "Green Hills",
+        "type": "plains",
+        "visual_description": "Bright green rolling hills with blue sky. Simple, welcoming starting area. Pastel colors, cheerful atmosphere.",
+        "audio_mood": "Upbeat chiptune music, bird chirps, gentle wind.",
+        "min_level": 1,
+        "max_level": 1,
+        "sub_areas": [
+          { "name": "Tutorial Zone", "description": "Teaches basic movement: run, jump, and land." },
+          { "name": "Hilltop Sprint", "description": "First real challenge with gaps and moving platforms." }
+        ]
+      },
+      {
+        "name": "Crystal Caverns",
+        "type": "cave",
+        "visual_description": "Dark underground caves lit by glowing crystals. Blue and purple palette. Stalactites, underground lakes, crystal platforms.",
+        "audio_mood": "Echoing drips, deep ambient hum, crystalline chimes.",
+        "min_level": 2,
+        "max_level": 2,
+        "sub_areas": [
+          { "name": "Crystal Maze", "description": "Platforms that shatter after stepping on them." },
+          { "name": "Dark Depths", "description": "Limited visibility. Light crystals guide the path." }
+        ]
+      },
+      {
+        "name": "Lava Fortress",
+        "type": "volcanic",
+        "visual_description": "Volcanic area with rising lava, crumbling platforms, and fire traps. Red-orange palette with dark stone.",
+        "audio_mood": "Rumbling bass, crackling fire, industrial clanging.",
+        "min_level": 3,
+        "max_level": 3,
+        "sub_areas": [
+          { "name": "The Gauntlet", "description": "Fast-paced section with rising lava chasing the player." },
+          { "name": "Boss Arena", "description": "Open arena for the final boss fight." }
+        ]
+      }
+    ]
+  },
+
+  "entities": {
+    "player": {
+      "visual_description": "Small character with expressive animations. Simple but iconic design.",
+      "stats": ["health"],
+      "abilities": [
+        { "name": "Jump", "description": "Basic jump.", "cooldown_seconds": 0, "resource_cost": "none" },
+        { "name": "Dash", "description": "Quick horizontal dash. Refreshes on landing.", "cooldown_seconds": 0.5, "resource_cost": "none" },
+        { "name": "Wall Jump", "description": "Jump off walls to reach higher places.", "cooldown_seconds": 0, "resource_cost": "none" }
+      ]
+    },
+    "enemies": [
+      { "name": "Slime", "type": "normal", "description": "Bouncing blob that patrols back and forth.", "behavior": "patrol", "level_range": { "min": 1, "max": 1 } },
+      { "name": "Bat", "type": "normal", "description": "Flying enemy that swoops at the player.", "behavior": "ambush", "level_range": { "min": 1, "max": 2 } },
+      { "name": "Fire Golem", "type": "boss", "description": "Lava boss that throws fireballs and creates lava waves.", "behavior": "aggressive", "level_range": { "min": 3, "max": 3 }, "abilities": ["Fireball Throw", "Lava Wave", "Ground Pound"] }
+    ]
+  },
+
+  "logic": {
+    "quests": [
+      { "name": "World 1 Complete", "type": "main_story", "description": "Clear all Green Hills stages.", "level_requirement": 1, "steps": [
+        { "order": 1, "description": "Clear Stage 1-1.", "objective_type": "explore" },
+        { "order": 2, "description": "Clear Stage 1-2.", "objective_type": "explore" },
+        { "order": 3, "description": "Clear Stage 1-3.", "objective_type": "explore" }
+      ], "rewards": { "unlock": "World 2: Crystal Caverns" } },
+      { "name": "Final Challenge", "type": "main_story", "description": "Defeat the Fire Golem.", "level_requirement": 3, "steps": [
+        { "order": 1, "description": "Reach the Lava Fortress boss arena.", "objective_type": "explore" },
+        { "order": 2, "description": "Defeat the Fire Golem.", "objective_type": "kill" }
+      ], "rewards": { "unlock": "Credits and Speed Run Mode" } }
+    ]
+  }
+}
