@@ -10,8 +10,15 @@ from pathlib import Path
 from typing import Optional
 from datetime import datetime
 
-SCHEMA_PATH = Path(__file__).resolve().parent.parent / "cli" / "forgedna" / "schemas" / "game_dna.schema.json"
-TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "cli" / "forgedna" / "templates"
+SCHEMA_PATH = Path(__file__).resolve().parent / "schema" / "game_dna.schema.json"
+
+# Fallback: also check parent/schema for HF Spaces layout
+if not SCHEMA_PATH.exists():
+    SCHEMA_PATH = Path(__file__).resolve().parent.parent / "schema" / "game_dna.schema.json"
+
+TEMPLATES_DIR = Path(__file__).resolve().parent / "templates"
+if not TEMPLATES_DIR.exists():
+    TEMPLATES_DIR = Path(__file__).resolve().parent.parent / "cli" / "forgedna" / "templates"
 
 _schema_cache: Optional[dict] = None
 
