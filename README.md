@@ -66,8 +66,49 @@ See the comprehensive [USER MANUAL](USER_MANUAL.md) for detailed extraction comm
 
 ---
 
+## The GameDNA Schema
+
+The heart of ForgeDNA is the **`game_dna.json` schema** — a universal, engine-agnostic JSON format for defining complete game designs. It captures everything an AI agent needs to generate a playable game:
+
+| Section | Purpose |
+|---------|---------|
+| `meta` | Title, genre, art style, platforms, player count |
+| `mechanics` | Movement, combat, crafting, progression, economy, custom mechanics |
+| `world` | Environments, dungeons, procedural generation, weather |
+| `entities` | Player, NPCs, enemies, items, equipment |
+| `assets` | AI-generation-ready descriptions for 3D models, textures, audio, VFX |
+| `logic` | Quests, world events, skill trees, crafting recipes |
+| `ui` | HUD layout, menus, accessibility, color palette |
+
+### Schema Location
+
+- **Schema definition:** `schema/game_dna.schema.json`
+- **JSON Schema spec:** Validatable with any JSON Schema validator (draft-07)
+
+### Example GameDNA Files
+
+| File | Game | Complexity |
+|------|------|------------|
+| `examples/fantasy-mmorpg.json` | **Echoes of Aethermoor** — 5-region MMORPG with 8 elements, classless glyph system, 5 difficult dungeons, 20-person raid, player economy | ~52KB, full schema |
+| `examples/pixel-drift.json` | **Pixel Drift** — Retro-futuristic 2D hover-bike racing with drifting mechanics, 3 environments, procedural tracks | ~14KB, focused |
+| `examples/quiet-hollow.json` | **Quiet Hollow** — Cozy hand-painted puzzle-adventure about restoring a garden. No combat, plant growth puzzles | ~12KB, minimal |
+
+### Using the Schema
+
+```bash
+# Validate a game_dna.json file against the schema
+python -c "import jsonschema; import json; schema=json.load(open('schema/game_dna.schema.json')); dna=json.load(open('your_game.json')); jsonschema.validate(dna, schema)"
+
+# Or use any online JSON Schema validator with draft-07 support
+```
+
+---
+
 ## 🛠️ Repository Structure
+
 Because this is a full-stack monorepo, it contains both the frontend Hub and the backend Substrate:
+* `schema/` — The formal JSON Schema definition for game_dna.json files.
+* `examples/` — Example GameDNA files ranging from simple to complex.
 * `Schema-Builder/artifacts/forge-dna/` - The React/Vite Frontend for the Community Hub.
 * `Schema-Builder/artifacts/api-server/` - The Express API Server and PostgreSQL backend.
 * `Schema-Builder/artifacts/forge-substrate/` - The headless Godot Docker container / MCP Server.

@@ -1,0 +1,212 @@
+{
+  "$schema": "../game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "title": "Pixel Drift",
+    "tagline": "Drift through neon skies. Chase the horizon.",
+    "description": "A retro-futuristic 2D racing game with platforming elements. Pilot customizable hover-bikes through procedurally generated neon cityscapes, floating islands, and underground tunnels. Drift, boost, and wall-ride your way to victory. Single-player campaign with 50 hand-crafted tracks plus infinite procedural mode.",
+    "genre": ["racing", "platformer"],
+    "art_style": "pixel_art_16bit",
+    "target_platforms": ["pc", "web", "android", "ios"],
+    "player_count": { "min": 1, "max": 4, "mode": "pvp" },
+    "rating": "everyone",
+    "tags": ["retro", "neon", "racing", "drifting", "procedural", "synthwave"],
+    "inspiration": ["F-Zero", "Trackmania", "Neon Drive", "Sonic Mania"]
+  },
+
+  "mechanics": {
+    "movement": {
+      "types": ["run", "sprint", "jump", "double_jump", "dash", "wall_run", "drive_vehicle"],
+      "physics_style": "arcade"
+    },
+    "combat": { "style": null },
+    "crafting": { "enabled": false },
+    "progression": {
+      "type": "level_based",
+      "max_level": 50,
+      "skill_trees": [
+        { "name": "Speed", "description": "Top speed, acceleration, boost power.", "node_count_estimate": 15 },
+        { "name": "Handling", "description": "Drift control, turning radius, air control.", "node_count_estimate": 15 },
+        { "name": "Style", "description": "Trail effects, sound customization, victory animations.", "node_count_estimate": 20 }
+      ],
+      "respec_available": true
+    },
+    "economy": {
+      "enabled": true,
+      "currencies": [{ "name": "Drift Coins", "type": "primary", "description": "Earned by winning races and setting records." }],
+      "player_trading": false,
+      "auction_house": false,
+      "player_owned_shops": false
+    },
+    "custom_mechanics": [
+      {
+        "name": "Drift Boost Chain",
+        "description": "Maintaining long drifts builds a boost meter. Chaining drifts without touching walls multiplies the boost. Perfect drifts through corners give bonus speed.",
+        "rules": ["Each second of drift fills 10% of boost meter", "3+ drift chain = 1.5x boost multiplier", "Perfect drift (no wall contact, tight line) = instant 25% meter fill", "Boost can be stored and released strategically"],
+        "interactions": ["Boost pads on tracks stack with drift boost", "Some shortcuts require a maxed boost to reach", "Time trials reward perfect drift chains with ghost unlock"]
+      }
+    ]
+  },
+
+  "world": {
+    "scale": "medium",
+    "structure": "level_based",
+    "day_night_cycle": true,
+    "weather_system": ["clear", "rain", "neon_storm"],
+    "time_of_day_effects": true,
+    "environments": [
+      {
+        "name": "Neon District",
+        "type": "city",
+        "visual_description": "A sprawling cyberpunk cityscape of towering neon signs, holographic billboards, and rain-slicked streets. Tracks wind through skyscraper canyons, over rooftop highways, and through underground parking structures. Everything glows in hot pink, electric blue, and acid green. Color palette: black, hot pink, electric blue, acid green, white.",
+        "audio_mood": "Pulsing synthwave bass, retro wave arpeggios, distant city hum, rain on metal, engine reverb through tunnels.",
+        "min_level": 1,
+        "max_level": 20,
+        "sub_areas": [
+          { "name": "Downtown Circuit", "description": "Beginner-friendly flat track through neon-lit streets. Wide turns, few obstacles." },
+          { "name": "Skyline Run", "description": "Rooftop track with gaps and ramps between buildings. Falling off = respawn at last checkpoint." },
+          { "name": "Undercity Tunnels", "description": "Underground track with tight turns, oncoming traffic, and shortcut pipes." }
+        ],
+        "resources": [],
+        "factions_present": [],
+        "ambiance": { "lighting": "Neon glow, volumetric light beams, bloom", "fog": "Rain mist, light fog in tunnels", "particles": "Rain, neon sparks, tire smoke", "sky": "Dark purple with neon reflections on clouds" }
+      },
+      {
+        "name": "Crystal Islands",
+        "type": "sky_island",
+        "visual_description": "Floating islands of crystalline rock suspended in an endless blue sky. Tracks loop around island edges, jump between floating platforms, and spiral through crystal caves. Waterfalls pour off edges into nothingness. Color palette: sky blue, crystal white, soft gold, cloud grey.",
+        "audio_mood": "Uplifting electronic melodies, wind rushing, crystal chimes on near-misses, gentle whoosh of open air.",
+        "min_level": 15,
+        "max_level": 35,
+        "sub_areas": [
+          { "name": "Cloud Pier", "description": "Open-air track with massive jumps between islands. Gliding sections." },
+          { "name": "Crystal Caverns", "description": "Inside the islands — tight crystal tunnels with prismatic light." },
+          { "name": "The Edge", "description": "Track on the very edge of floating islands. No guard rails. High risk, high reward shortcuts." }
+        ],
+        "resources": [],
+        "factions_present": [],
+        "ambiance": { "lighting": "Bright daylight, prismatic crystal reflections", "fog": "Cloud banks at island edges", "particles": "Cloud wisps, crystal dust, wind streaks", "sky": "Endless blue with scattered island shadows" }
+      },
+      {
+        "name": "Magma Core",
+        "type": "volcanic",
+        "visual_description": "Deep underground volcanic track system. Rivers of lava illuminate cavern walls. Tracks are carved from obsidian with lava-fall jumps and heat-haze distortion. The air glows orange-red. Color palette: deep red, orange, obsidian black, molten gold.",
+        "audio_mood": "Heavy industrial beats, rumbling bass, lava bubbling, metal grinding on rails, dramatic synth stabs.",
+        "min_level": 30,
+        "max_level": 50,
+        "sub_areas": [
+          { "name": "Obsidian Speedway", "description": "Long straightaways on cooled lava with lava-fall shortcuts." },
+          { "name": "Magma Tubes", "description": "Circular tunnel tracks that loop through active magma chambers." },
+          { "name": "The Crucible", "description": "Final championship track. Combines all mechanics at maximum speed." }
+        ],
+        "resources": [],
+        "factions_present": [],
+        "ambiance": { "lighting": "Orange-red lava glow, heat distortion", "fog": "Ash particles, steam vents", "particles": "Embers, sparks, lava drips", "sky": "Cavern ceiling glowing with heat" }
+      }
+    ],
+    "procedural_generation": {
+      "enabled": true,
+      "scope": ["dungeons", "loot"],
+      "seed_based": true,
+      "description": "Infinite procedural track generation. Select environment, difficulty, and length. Share track seeds with friends. Daily challenge tracks for global leaderboards."
+    }
+  },
+
+  "entities": {
+    "player": {
+      "visual_description": "Rider on a hover-bike. Rider is customizable with helmets, suits, and trail effects. Bike is customizable with body, engine, wheels, and color scheme.",
+      "customization": { "body_types": ["slim", "standard", "heavy"], "facial_features": false, "hair_styles": 0, "skin_colors": 0, "equipment_visibility": true },
+      "stats": ["speed", "acceleration", "handling", "boost_power", "boost_duration"],
+      "abilities": [
+        { "name": "Drift", "description": "Enter drift mode around corners. Builds boost meter.", "cooldown_seconds": 0, "resource_cost": "none" },
+        { "name": "Boost", "description": "Release stored boost energy for a speed burst.", "cooldown_seconds": 0, "resource_cost": "boost meter" },
+        { "name": "Air Spin", "description": "Rotate in air for style points and small speed bonus on landing.", "cooldown_seconds": 3, "resource_cost": "none" }
+      ]
+    },
+    "enemies": [],
+    "items": {
+      "rarity_tiers": [
+        { "name": "Standard", "color_hex": "#9d9d9d", "drop_rate_weight": 60 },
+        { "name": "Custom", "color_hex": "#1eff00", "drop_rate_weight": 30 },
+        { "name": "Rare", "color_hex": "#0070dd", "drop_rate_weight": 8 },
+        { "name": "Legendary", "color_hex": "#ff8000", "drop_rate_weight": 2 }
+      ],
+      "equipment_slots": ["bike_body", "bike_engine", "bike_wheels", "rider_helmet", "rider_suit", "trail_effect", "horn_sound"],
+      "categories": [
+        { "name": "Bike Parts", "description": "Performance and cosmetic parts for the hover-bike.", "examples": ["Neon Frame", "Turbo Engine Mk3", "Crystal Wheels"] },
+        { "name": "Rider Gear", "description": "Cosmetic gear for the rider character.", "examples": ["Retro Helmet", "Champion Suit", "Holographic Visor"] },
+        { "name": "Effects", "description": "Visual and audio trail effects.", "examples": ["Rainbow Trail", "Fire Trail", "Synthwave Sound Pack"] }
+      ]
+    }
+  },
+
+  "assets": {
+    "models_3d": [],
+    "textures": [
+      { "name": "Neon Glow Surface", "description": "Self-illuminating surface with hot pink/blue neon glow. Bloom-enabled.", "tags": ["environment", "neon"] },
+      { "name": "Rain-slicked Road", "description": "Wet asphalt reflecting neon lights. Puddle reflections.", "tags": ["environment", "city"] }
+    ],
+    "animations": [
+      { "name": "Drift Slide", "description": "Bike tilts hard into a drift — sparks fly from wheels, tire smoke trails.", "tags": ["movement", "drift"] },
+      { "name": "Boost Burst", "description": "Engine flames erupt, speed lines appear, screen slightly stretches for speed feel.", "tags": ["movement", "boost"] }
+    ],
+    "audio": {
+      "music": [
+        { "name": "Neon District Theme", "mood": "energetic, retro, driving", "description": "Pulsing synthwave with heavy bass, arpeggiated synths, and a driving beat at 128 BPM.", "loop": true, "environment": "Neon District" },
+        { "name": "Crystal Islands Theme", "mood": "uplifting, airy, adventurous", "description": "Bright chiptune melodies over airy pads. 140 BPM with a soaring lead.", "loop": true, "environment": "Crystal Islands" }
+      ],
+      "sfx": [
+        { "name": "Drift Screech", "description": "Tire screech with metallic scrape and spark crackle.", "trigger": "Entering drift mode" },
+        { "name": "Boost Ignition", "description": "Whoosh-BOOM jet engine ignition with bass drop.", "trigger": "Activating boost" }
+      ],
+      "ambient": [
+        { "name": "City Night", "description": "Distant traffic, neon hum, rain patter, occasional siren.", "environment": "Neon District" }
+      ],
+      "voice": []
+    },
+    "vfx": [
+      { "name": "Drift Sparks", "description": "Bright sparks showering from bike wheels during drift. Color matches bike trail.", "tags": ["drift", "feedback"] },
+      { "name": "Boost Flame", "description": "Blue-white exhaust flame expanding during boost. Heat distortion behind.", "tags": ["boost", "feedback"] }
+    ]
+  },
+
+  "logic": {
+    "quests": [
+      { "name": "First Ride", "type": "main_story", "description": "Learn the basics of drifting, boosting, and track navigation.", "level_requirement": 1, "steps": [
+        { "order": 1, "description": "Complete the tutorial track.", "objective_type": "explore" },
+        { "order": 2, "description": "Win your first race on Downtown Circuit.", "objective_type": "explore" }
+      ], "rewards": { "xp": 200, "items": ["Starter Bike Custom Paint"] } },
+      { "name": "Speed Demon", "type": "side_quest", "description": "Set a time under 1:30 on the Skyline Run.", "level_requirement": 15, "steps": [
+        { "order": 1, "description": "Complete Skyline Run in under 1:30.", "objective_type": "explore" }
+      ], "rewards": { "xp": 1000, "items": ["Turbo Engine Mk1"] } }
+    ],
+    "world_events": [
+      { "name": "Daily Challenge Track", "type": "daily", "description": "A new procedural track every day. Global leaderboard. Top 10% earn bonus coins.", "rewards": ["Drift Coins", "Daily Champion Badge"] }
+    ],
+    "crafting_recipes": []
+  },
+
+  "ui": {
+    "style": "Clean retro-futuristic. Pixel art UI elements with smooth animations. Neon accent borders.",
+    "color_palette": { "primary": "#0a0a0a", "secondary": "#1a1a2e", "accent": "#ff2d95", "background": "#050510", "text": "#ffffff" },
+    "hud_elements": [
+      { "name": "Speedometer", "position": "bottom_right", "description": "Retro LED speed display with trailing digits." },
+      { "name": "Boost Meter", "position": "bottom_center", "description": "Horizontal bar below speedometer. Fills with drift, releases with boost." },
+      { "name": "Position/Lap Counter", "position": "top_center", "description": "Current position and lap number." },
+      { "name": "Mini-map", "position": "top_right", "description": "Track overview showing player position and other racers." }
+    ],
+    "menus": [
+      { "name": "Main Menu", "type": "main_menu", "description": "Animated bike spinning on a neon pedestal. Campaign, Time Trial, Multiplayer, Garage." },
+      { "name": "Garage", "type": "inventory", "description": "Customize bike and rider. 3D preview with rotation." },
+      { "name": "Track Select", "type": "map", "description": "Grid of track thumbnails with best times and star ratings." }
+    ],
+    "accessibility": {
+      "colorblind_modes": ["protanopia", "deuteranopia"],
+      "subtitle_support": true,
+      "remappable_controls": true,
+      "screen_reader_support": false,
+      "font_scaling": true
+    }
+  }
+}

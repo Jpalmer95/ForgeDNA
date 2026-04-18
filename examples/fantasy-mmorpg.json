@@ -1,0 +1,499 @@
+{
+  "$schema": "../game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "title": "Echoes of Aethermoor",
+    "tagline": "Wield the elements. Forge your legend. Shape the world itself.",
+    "description": "Echoes of Aethermoor is a persistent fantasy MMORPG set on the fractured continent of Aethermoor — a land torn apart by the Sundering, a cataclysmic event where the eight primordial Elements tore free from the world's core. Centuries later, the land has healed into wildly different biomes, each infused with elemental energy. Players are Weavers — rare individuals who can channel raw elemental power through ancient Resonance Glyphs found in dungeons, ruins, and the wild. There are no fixed classes; your abilities are defined by which elements you attune, which glyphs you equip, and how you combine them. A fire-weaving berserker can become a frost-wielding tank overnight by swapping glyphs. The world is designed for deep exploration, punishing dungeon encounters, meaningful crafting, and a player-driven economy that shapes server-wide events.",
+    "genre": ["mmorpg", "rpg", "open_world"],
+    "art_style": "stylized",
+    "target_platforms": ["pc", "mac", "linux"],
+    "player_count": { "min": 1, "max": 1000, "mode": "mmo" },
+    "rating": "teen",
+    "tags": ["fantasy", "elemental_magic", "open_world", "difficult_dungeons", "classless", "player_economy", "crafting_deep", "exploration", "co-op", "pvp_zones"],
+    "inspiration": ["Guild Wars 2", "Elder Scrolls Online", "Path of Exile", "Monster Hunter", "Shadow of the Colossus", "Breath of the Wild"]
+  },
+
+  "mechanics": {
+    "movement": {
+      "types": ["walk", "run", "sprint", "sneak", "jump", "double_jump", "climb", "swim", "dive", "glide", "grapple", "dash", "dodge", "roll", "ride_mount"],
+      "physics_style": "snappy",
+      "mounts_vehicles": [
+        { "name": "Windsprint Stag", "type": "ground", "speed": "fast", "description": "Graceful antlered mount native to the Verdant Cradle. Unlocks double-jump while mounted." },
+        { "name": "Cinderback Drake", "type": "air", "speed": "normal", "description": "A small drake bred for flight. Can glide but not truly fly indefinitely. Found in the Shattered Peaks." },
+        { "name": "Tidecaller Turtle", "type": "water", "speed": "slow", "description": "Massive sea turtle mount for ocean traversal. Can dive to underwater ruins." },
+        { "name": "Ironclad Beetle", "type": "ground", "speed": "normal", "description": "Armored insect mount for the Molten Expanse. Resistant to lava damage." },
+        { "name": "Crystalwing Hawk", "type": "air", "speed": "fast", "description": "Rare mount from the Crystal Hollows. Glows faintly, illuminating dark areas." }
+      ]
+    },
+    "combat": {
+      "style": "action_rpg",
+      "damage_types": ["physical_slash", "physical_pierce", "physical_blunt", "fire", "ice", "lightning", "earth", "nature", "shadow", "holy", "arcane", "void"],
+      "defense_types": ["plate_armor", "leather_armor", "cloth_armor", "natural_hide", "elemental_barrier", "void_ward"],
+      "weapon_categories": [
+        { "name": "Greatswords", "damage_type": "physical_slash", "range": "melee", "speed": "slow", "description": "Two-handed blades with wide sweeping attacks. High damage, cleave potential." },
+        { "name": "Dual Daggers", "damage_type": "physical_pierce", "range": "melee", "speed": "very_fast", "description": "Fast-hitting combo weapons. Apply bleeds and exploit openings." },
+        { "name": "Warhammers", "damage_type": "physical_blunt", "range": "melee", "speed": "very_slow", "description": "Massive impact weapons. Stagger enemies and shatter armor." },
+        { "name": "Longbows", "damage_type": "physical_pierce", "range": "long", "speed": "normal", "description": "Precision ranged weapons. Charged shots deal massive single-target damage." },
+        { "name": "Resonance Staves", "damage_type": "arcane", "range": "medium", "speed": "normal", "description": "Channeling weapons for elemental magic. Amplify glyph power." },
+        { "name": "Runed Tomes", "damage_type": "arcane", "range": "medium", "speed": "slow", "description": "Off-hand casting implements. Buff allies and debuff enemies." },
+        { "name": "Spears", "damage_type": "physical_pierce", "range": "close", "speed": "fast", "description": "Versatile reach weapons. Good for both thrusting and sweeping." },
+        { "name": "Twinblades", "damage_type": "physical_slash", "range": "melee", "speed": "fast", "description": "Circular bladed weapons. Constant spin attacks create a whirlwind of steel." }
+      ],
+      "status_effects": [
+        { "name": "Ignite", "element": "fire", "effect": "Burns target dealing fire damage over 8 seconds. Stacks up to 5 times.", "duration_type": "stacking" },
+        { "name": "Frostbite", "element": "ice", "effect": "Slows movement by 30% and attack speed by 15%. At 3 stacks, roots target in ice.", "duration_type": "stacking" },
+        { "name": "Overcharge", "element": "lightning", "effect": "Target crackles with electricity. Next hit on them chains lightning to nearby enemies.", "duration_type": "timed" },
+        { "name": "Petrify", "element": "earth", "effect": "Encases target in stone. Cannot move or act. Breaks on heavy damage.", "duration_type": "timed" },
+        { "name": "Entangle", "element": "nature", "effect": "Vines root target in place. Target can still attack but cannot move.", "duration_type": "timed" },
+        { "name": "Wither", "element": "shadow", "effect": "Drains life force. Reduces healing received by 50% and deals shadow DoT.", "duration_type": "timed" },
+        { "name": "Consecrate", "element": "holy", "effect": "Blesses an area. Allies inside regenerate health. Undead take continuous damage.", "duration_type": "timed" },
+        { "name": "Arcane Flux", "element": "arcane", "effect": "Unstable energy. Increases damage taken and dealt by 20%.", "duration_type": "timed" },
+        { "name": "Void Corruption", "element": "void", "effect": "Reality fractures. Randomly teleports target short distances. Deals void damage over time.", "duration_type": "timed" },
+        { "name": "Bleed", "element": "physical", "effect": "Open wound dealing physical damage over time. Stacks increase tick rate.", "duration_type": "stacking" },
+        { "name": "Stagger", "element": "physical", "effect": "Momentarily stunned. Interrupts current action. Build-up based on damage taken.", "duration_type": "instant" }
+      ]
+    },
+    "crafting": {
+      "enabled": true,
+      "professions": ["Blacksmithing", "Alchemy", "Enchanting", "Runecrafting", "Tailoring", "Jewelcrafting", "Cooking", "Tinkering"],
+      "gathering_skills": ["Mining", "Herbalism", "Skinning", "Logging", "Fishing", "Elemental Harvesting", "Crystal Shards"],
+      "complexity": "deep"
+    },
+    "progression": {
+      "type": "classless_hybrid",
+      "max_level": 80,
+      "skill_trees": [
+        { "name": "Elemental Affinity", "description": "Deepen your connection to each of the 8 elements. Unlock more powerful glyphs and combo reactions.", "node_count_estimate": 96 },
+        { "name": "Combat Mastery", "description": "Improve weapon techniques, combo chains, dodge timing, and counter-attacks for each weapon type.", "node_count_estimate": 64 },
+        { "name": "Survival Instinct", "description": "Enhance health, stamina, elemental resistance, and out-of-combat regeneration.", "node_count_estimate": 32 },
+        { "name": "Crafting Expertise", "description": "Unlock advanced recipes, improve crafting speed, bonus stats on crafted items.", "node_count_estimate": 48 },
+        { "name": "Explorer's Path", "description": "Faster movement, reduced fall damage, improved gathering, hidden path detection.", "node_count_estimate": 28 }
+      ],
+      "respec_available": true
+    },
+    "economy": {
+      "enabled": true,
+      "currencies": [
+        { "name": "Aether Shards", "type": "primary", "description": "Primary currency. Crystallized elemental energy." },
+        { "name": "Resonance Coins", "type": "premium", "description": "Earned through achievements and world events. Cosmetics and convenience." },
+        { "name": "Faction Tokens", "type": "faction", "description": "Earned from faction tasks. Used for faction gear and recipes." }
+      ],
+      "player_trading": true,
+      "auction_house": true,
+      "player_owned_shops": true
+    },
+    "custom_mechanics": [
+      {
+        "name": "Elemental Resonance Combos",
+        "description": "When two or more elements overlap on a target, they create a Resonance Reaction — powerful emergent effects rewarding coordination.",
+        "rules": [
+          "Fire + Ice = Steam Cloud: 5m fog zone blinding enemies, -40% accuracy.",
+          "Lightning + Water = Electrified Pool: Stuns enemies standing in water.",
+          "Earth + Fire = Magma Pool: Ground melts into lava, heavy fire AoE.",
+          "Nature + Holy = Overgrowth: Healing vines create a safe zone.",
+          "Shadow + Void = Reality Tear: Rift pulls enemies inward dealing void damage.",
+          "Arcane + any element = Amplify: Doubles effect and duration."
+        ],
+        "interactions": [
+          "Reactions can chain: Steam Cloud + Lightning = Thundercloud strikes.",
+          "Dungeons require specific reactions to solve elemental puzzles.",
+          "Boss phase transitions triggered by elemental reactions.",
+          "Environmental reactions in volcanic areas."
+        ]
+      },
+      {
+        "name": "Glyph Attunement System",
+        "description": "Players equip Resonance Glyphs defining abilities. Equipping multiple same-element glyphs unlocks Deep Attunement ultimates.",
+        "rules": [
+          "Up to 4 active glyphs and 2 passive glyphs equipped.",
+          "Mono-element builds unlock Deep Attunement ultimate.",
+          "Hybrid builds unlock Resonance Combos but no ultimate.",
+          "Glyphs upgradeable with elemental crystals."
+        ],
+        "interactions": [
+          "Swap glyphs at rest points freely.",
+          "Some puzzles require specific glyph combos.",
+          "PvP normalizes glyph power.",
+          "Guilds pool glyphs for territory control."
+        ]
+      },
+      {
+        "name": "Dynamic World Shaping",
+        "description": "Player actions permanently alter server-wide world state. Defeating world bosses changes biomes. Ignoring threats spreads corruption.",
+        "rules": [
+          "Each server has unique world state from collective choices.",
+          "Void rifts ignored = zones corrupted with tougher enemies, better loot.",
+          "Guilds organize raids to push back corruption and restore zones.",
+          "Server-first achievements for major events.",
+          "Seasonal world bosses rotating element types."
+        ],
+        "interactions": [
+          "Corrupted zones have exclusive crafting materials.",
+          "Purified zones unlock rare merchants with exclusive recipes.",
+          "World map reflects server history.",
+          "Visit other servers for different world states."
+        ]
+      }
+    ]
+  },
+
+  "world": {
+    "scale": "massive",
+    "structure": "open_world",
+    "day_night_cycle": true,
+    "weather_system": ["clear", "overcast", "rain", "thunderstorm", "fog", "blizzard", "sandstorm", "ash_fall", "aurora"],
+    "time_of_day_effects": true,
+    "environments": [
+      {
+        "name": "Verdant Cradle",
+        "type": "forest",
+        "visual_description": "An ancient sprawling forest where massive trees form a living cathedral of green. Bioluminescent flowers and mosses cast soft blue-green glows along the forest floor. Canopy walkways and rope bridges connect treetop settlements. Sunlight filters through in golden shafts. Waterfalls cascade from elevated root systems. The air shimmers with motes of nature-element energy. Color palette: deep emerald, gold, soft blue, warm brown, violet.",
+        "audio_mood": "Gentle wind through ancient canopy, distant bird calls with magical reverb, soft bubbling streams, chime of crystal wind catchers.",
+        "min_level": 1,
+        "max_level": 25,
+        "sub_areas": [
+          { "name": "Elderwood Grove", "description": "Heart of the forest where the World Tree's roots breach the surface. NPC capital city with markets, guild halls, and Elemental Academy." },
+          { "name": "Mosshollow Expanse", "description": "Marshy forest floor with giant mushrooms and spore clouds. Hostile fungal creatures and rare herbalism nodes." },
+          { "name": "Canopy District", "description": "Elevated treetop pathways. Ranger outposts, glider launch points, hidden elven shrines." },
+          { "name": "Rootmaze Caverns", "description": "Underground network beneath World Tree roots. Twisting tunnels with nature-aligned enemies and hidden glyphs." }
+        ],
+        "resources": ["Heartwood Lumber", "Moonpetal Herbs", "Living Sap Crystals", "Nature Essence Shards"],
+        "factions_present": ["Verdant Circle (druids)", "Thornwatch (guardians)", "Rootbound (corrupted)"],
+        "ambiance": { "lighting": "Dappled sunlight, bioluminescent glow at night", "fog": "Light morning mist, thick spore fog in Mosshollow", "particles": "Pollen motes, nature wisps, falling leaves", "sky": "Warm blue through canopy gaps, stars at night" }
+      },
+      {
+        "name": "Molten Expanse",
+        "type": "volcanic",
+        "visual_description": "A vast volcanic wasteland with rivers of magma carving channels through obsidian fields. Jagged volcanic peaks belch smoke into a perpetually orange-red sky. The ground glows with heat cracks pulsing like veins of fire. Dwarven forge-cities built into mountainsides. Lava lakes bubble and pop. Massive fire elementals roam as world-scale creatures. Color palette: deep red, burnt orange, obsidian black, molten gold, ash grey.",
+        "audio_mood": "Deep rumbling earth tremors, hissing steam vents, clanging dwarven forges, crackling fires, booming fire elemental footsteps.",
+        "min_level": 20,
+        "max_level": 45,
+        "sub_areas": [
+          { "name": "Forgeheart Citadel", "description": "Dwarven stronghold inside a dormant caldera. Largest crafting hub. Grand Auction House." },
+          { "name": "Obsidian Fields", "description": "Flat plains of volcanic glass reflecting the sky. Fast aggressive enemies. Excellent mining." },
+          { "name": "The Crucible", "description": "Massive lava lake with stepping stones. Jumping puzzle leading to hidden fire-glyph shrines." },
+          { "name": "Emberpeak Summit", "description": "Highest volcanic peak. World boss encounter site. Perpetual ember-storms and lightning." }
+        ],
+        "resources": ["Obsidian Ore", "Magma Crystals", "Fire Essence Shards", "Emberthread Silk"],
+        "factions_present": ["Ironforge Covenant (dwarves)", "Ashwalker Tribes", "Flamebound Cultists"],
+        "ambiance": { "lighting": "Perpetual warm orange-red glow from magma", "fog": "Ash haze, steam vent clouds", "particles": "Floating embers, ash snowfall, sparks", "sky": "Perpetual orange-red, dim red sun through smoke" }
+      },
+      {
+        "name": "Crystal Hollows",
+        "type": "crystal",
+        "visual_description": "Enormous underground caverns where arcane energy crystallized into massive formations of every color. Towering crystal spires refract ambient magical light creating an ever-shifting kaleidoscope. The ground chimes when walked upon. Underground crystal lakes so clear they are nearly invisible. Floating crystal islands drift through the largest chambers. Architecture built from shaped crystal — transparent walls and prismatic roofs. Color palette: prismatic — violet, teal, magenta, soft gold, ice-blue.",
+        "audio_mood": "Soft crystalline chimes, harmonic hum of arcane energy, echoing water drips, musical tones when crystals are touched, whisper-hiss of arcane currents.",
+        "min_level": 35,
+        "max_level": 55,
+        "sub_areas": [
+          { "name": "Prismata Academy", "description": "Arcane scholar's capital. Crystal towers and light-bridges. Best enchanting and runecrafting facilities." },
+          { "name": "The Shimmerdeep", "description": "Lowest caverns. Wild uncontrolled crystal growth. Hostile crystal golems guard rare veins." },
+          { "name": "Refractive Maze", "description": "Crystal wall labyrinth redirecting light beams. Puzzle area requiring arcane-glyph manipulation." },
+          { "name": "The Resonance Chamber", "description": "Natural amphitheater of harmonic crystals. Arcane world boss. The room itself fires crystal beams." }
+        ],
+        "resources": ["Arcane Crystals", "Prismatic Dust", "Resonance Shards", "Hardlight Filaments"],
+        "factions_present": ["Order of the Prism", "Crystal Singers", "Shatterborn (void-corrupted)"],
+        "ambiance": { "lighting": "All illumination from crystals — shifting prismatic colors, strong bloom", "fog": "Light arcane mist near formations", "particles": "Sparkling crystal dust motes, prismatic light fragments", "sky": "Cavern ceiling covered in crystal formations like a starfield" }
+      },
+      {
+        "name": "Shattered Peaks",
+        "type": "mountains",
+        "visual_description": "A colossal mountain range shattered during the Sundering — peaks literally float at various heights separated by yawning chasms. Snow covers upper reaches, lower valleys are windswept barren rock. Frozen waterfalls connect floating peaks like glass bridges. Lightning constantly arcs between highest points. Ancient temples carved into cliff faces accessible by glider or grapple. At the center floats the Shattered Heart — a massive inverted mountain. Color palette: ice white, slate grey, electric blue, deep indigo, pale violet.",
+        "audio_mood": "Howling mountain winds, cracking ice, distant thunder, screech of sky-drakes, deep bass hum of the Shattered Heart's void.",
+        "min_level": 45,
+        "max_level": 65,
+        "sub_areas": [
+          { "name": "Skyreach Bastion", "description": "Fortress city on the largest peak cluster. Windrunner faction HQ. Glider racing league. PvP tournament arena." },
+          { "name": "The Frostbound Sanctum", "description": "Ancient ice temple frozen in time. Ice-puzzle dungeon with mirror-reflect mechanics." },
+          { "name": "Drake's Roost", "description": "Massive sky-drake nesting grounds. Taming challenges for air mounts. Extremely dangerous." },
+          { "name": "The Shattered Heart", "description": "Inverted floating mountain. Game's hardest platforming dungeon and void-element world boss." }
+        ],
+        "resources": ["Frost Iron Ore", "Storm Crystals", "Drake Scale Leather", "Thunderbird Feathers"],
+        "factions_present": ["Windrunners (sky nomads)", "Frostwardens (ice monks)", "Stormcallers (shamans)"],
+        "ambiance": { "lighting": "Cold blue-white daylight, lightning stroboscopic at peaks, aurora at night", "fog": "Thick cloud banks at mid-altitude, blinding blizzards", "particles": "Snow flurries, ice crystals, lightning sparks, cloud wisps at eye level", "sky": "Floating peaks above, stormy purple-grey at peaks, vivid stars at altitude" }
+      },
+      {
+        "name": "The Sunken Depths",
+        "type": "ocean",
+        "visual_description": "A vast underwater realm of drowned cities, building-sized kelp forests, and bioluminescent creatures drifting through dark water. Ancient elven ruins encrusted with coral sit at mid-water level. Massive sea creatures patrol deep trenches. Shallow areas have crystal clear sunlight beams. Deep trenches are pitch black except for eerie bioluminescent glow. Air pockets exist in ancient domed structures. Color palette: deep navy, teal, bioluminescent cyan-green, coral pink, abyssal black.",
+        "audio_mood": "Muffled underwater acoustics, distant whale-song, creaking ancient structures, gentle current, eerie silence of deep trenches broken by bass rumbles from unseen leviathans.",
+        "min_level": 55,
+        "max_level": 75,
+        "sub_areas": [
+          { "name": "Coral Citadel", "description": "Main underwater settlement in a massive coral dome. Air-filled. Tidal Forge for water-element gear." },
+          { "name": "Kelp Labyrinth", "description": "Dense kelp forest maze. Low visibility. Hostile creatures ambush. Hidden tide-pool fishing nodes." },
+          { "name": "Drowned Palaces", "description": "Sunken elven city. Ballrooms with floating debris, throne rooms overtaken by coral, lore libraries." },
+          { "name": "The Abyssal Trench", "description": "Deepest point in the game. Near-total darkness. Home to the Abyssal Leviathan world boss." }
+        ],
+        "resources": ["Pearlescent Ore", "Abyssal Ink", "Coral Shards", "Water Essence Shards", "Leviathan Bone"],
+        "factions_present": ["Tidecallers (ocean druids)", "Drowned Court (undead elves)", "Pearl Divers (merchants)"],
+        "ambiance": { "lighting": "Sunbeams in shallow water, bioluminescent glow in deep areas, arcane lantern sphere", "fog": "Particulate haze by distance, murky near sediment", "particles": "Floating debris, rising bubbles, bioluminescent sparkles", "sky": "Bright surface glow fading with depth, liquid glass ceiling from air pockets" }
+      }
+    ],
+    "dungeons": [
+      {
+        "name": "The Hollow Heart",
+        "difficulty": "hard",
+        "player_count": { "min": 3, "max": 5 },
+        "visual_description": "Deep in the Verdant Cradle's roots, corruption has taken hold. Descend through twisted roots into a cavern where a massive corrupted World Tree heart beats with dark purple energy. Walls pulse with sickly veins. Spore clouds everywhere.",
+        "floors": 4,
+        "boss_encounters": [
+          { "name": "Sporemother Yivara", "description": "Colossal fungal queen fused with World Tree roots. Body is a living mushroom colony.", "mechanics": ["Spawns explosive fungal adds every 30s", "Persistent toxic spore clouds", "50% HP immune shield broken by killing adds", "Root grab pulls random player to melee"], "phases": 3 },
+          { "name": "The Rotweaver", "description": "Corrupted druid guardian wielding decay magic and thorn walls.", "mechanics": ["Shifting thorn wall mazes every 20s", "Corruption pools spread if not cleansed", "Drains life from environment — destroy roots to stop", "8-minute enrage timer"], "phases": 2 }
+        ],
+        "traps": ["Poison darts in root walls", "Collapsing floors over pits", "Corruption clouds applying Wither", "Animated vine snares"],
+        "puzzles": ["Purify corrupted root nodes in sequence", "Redirect water to cleanse corruption", "Nature glyph puzzle to open sealed doors"],
+        "loot_tier": "epic",
+        "elemental_affinity": ["nature", "shadow"]
+      },
+      {
+        "name": "The Forge Eternal",
+        "difficulty": "very_hard",
+        "player_count": { "min": 3, "max": 5 },
+        "visual_description": "Ancient dwarven forge-complex in a volcano's heart. Air shimmers with heat. Metal glows. Lava flows through floor channels. Massive hammers powered by bound fire elementals. Descend toward the magma core.",
+        "floors": 5,
+        "boss_encounters": [
+          { "name": "Forgemaster Cinderveil", "description": "Mad dwarven blacksmith wielding a massive enchanted hammer, summoning fire constructs.", "mechanics": ["Ground slam creates expanding magma fissures", "Fire constructs must be kited into water", "Invulnerable forge phase — destroy the anvil", "Enrages gaining fire damage to all attacks"], "phases": 3 },
+          { "name": "Ignis Primordial", "description": "A fire elemental the size of a cathedral. The entire arena IS its body.", "mechanics": ["Arena floods with lava — reach elevated platforms", "Hands slam platforms from lava", "Fire breath sweeps in learnable patterns", "25% arena shrinks — pure DPS race", "Vulnerable to ice/water damage"], "phases": 4 }
+        ],
+        "traps": ["Lava geysers on timers", "Spinning gear crushers", "Heat vents dealing DoT", "Fire elemental sentries"],
+        "puzzles": ["Reroute lava flows to cool pathways", "Activate forge mechanisms in sequence", "Cool heated doors with ice glyphs"],
+        "loot_tier": "legendary",
+        "time_limit_minutes": 45,
+        "elemental_affinity": ["fire", "earth"]
+      },
+      {
+        "name": "Resonance Fracture",
+        "difficulty": "extreme",
+        "player_count": { "min": 3, "max": 5 },
+        "visual_description": "Crystal Hollows' deepest chamber where arcane energy fractured reality. Exists in multiple overlapping dimensions. Platforms float in zero-gravity. Non-euclidean geometry — corridors loop, gravity shifts. Prismatic chaos everywhere.",
+        "floors": 3,
+        "boss_encounters": [
+          { "name": "The Refracted Mind", "description": "Ancient arcane intelligence shattered into multiple copies. Fight several simultaneously while finding the true form.", "mechanics": ["5 copies — only true form takes real damage", "True form shifts every 45s with crystal pulse cue", "30% all copies merge — final burn phase"], "phases": 2 },
+          { "name": "Chromatic Wyrm", "description": "Crystalline dragon cycling all 8 elements. Each phase changes abilities and weaknesses.", "mechanics": ["Cycles all 8 elements every 60s", "Wrong damage type heals it", "Crystal pillars must be charged with matching elements", "Final phase: random element every 10s", "Drops legendary multi-element glyph"], "phases": 9 }
+        ],
+        "traps": ["Reality teleportation shifts", "Prismatic laser beams", "Gravity inversion zones", "Dimensional echo hazards"],
+        "puzzles": ["Align crystal prisms to focus light beams", "Navigate non-euclidean corridors with arcane compass", "Bounce light through crystal to hidden switches"],
+        "loot_tier": "mythic",
+        "time_limit_minutes": 60,
+        "elemental_affinity": ["arcane"]
+      },
+      {
+        "name": "The Drowned Oath",
+        "difficulty": "extreme",
+        "player_count": { "min": 5, "max": 10 },
+        "visual_description": "Massive sunken warship in The Sunken Depths. City-sized elven vessel encrusted with coral. Halls waterlogged with air in sealed chambers. Bioluminescent life everywhere. Deeper decks pitch black and flooded.",
+        "floors": 6,
+        "boss_encounters": [
+          { "name": "Admiral Thalassian's Echo", "description": "Ghost of the ship's elven admiral. Spectral sword techniques and ghost crew commands.", "mechanics": ["Ghost crew adds must be killed by rank order", "Tidal wave floods arena — reach elevated positions", "Ghost ship phase: arena tilts, players slide", "Strict timer from phase 2"], "phases": 3 },
+          { "name": "The Abyssal Leviathan", "description": "Sea creature so vast its body IS the ocean floor. Eye larger than the arena.", "mechanics": ["Tentacle attacks from ocean — dodge or grapple", "Swallows ship — fight adds inside its mouth", "Bioluminescent weak points on tentacles", "Full surface breach — fight on its body", "Drops legendary Abyssal Trident"], "phases": 4 }
+        ],
+        "traps": ["Flooding corridors on timers", "Hull breach pressure plates", "Ghost crew patrol routes", "Bioluminescent predator lures"],
+        "puzzles": ["Operate ancient helm to navigate obstacles", "Seal hull breaches with water-glyphs", "Decode elven navigation charts"],
+        "loot_tier": "mythic",
+        "time_limit_minutes": 90,
+        "elemental_affinity": ["water", "holy", "shadow"]
+      },
+      {
+        "name": "Void's Cradle",
+        "difficulty": "raid",
+        "player_count": { "min": 10, "max": 20 },
+        "visual_description": "A rift in reality at the Shattered Heart's core. The void dimension bleeding into the material world. Physics breaks down. Floor is a mosaic of floating debris. Distant stars and impossible geometries. A throne room of broken reality.",
+        "floors": 1,
+        "boss_encounters": [
+          { "name": "Vorthak, The Unraveler", "description": "The void entity that caused the Sundering. Exists partially outside reality. 20-person raid.", "mechanics": ["Reality phases: material/void plane alternation", "Unraveling: randomly deletes one player ability for 30s", "Void rifts must be closed by void-plane players", "Gravity inversion every 90s", "Memory wipe: all UI disappears for 15s", "Final stand: all 20 channel for 10s while adds swarm", "Server-wide event on defeat — permanently changes world state"], "phases": 5 }
+        ],
+        "traps": ["Reality tears teleporting to danger zones", "Void pockets silencing abilities", "Dimensional mirrors spawning hostile copies", "Time dilation zones"],
+        "puzzles": ["Material/void plane players align bridge segments", "10 players synchronize glyph activations", "Decode void-script in inverted text"],
+        "loot_tier": "mythic",
+        "time_limit_minutes": 120,
+        "elemental_affinity": ["void", "arcane"]
+      }
+    ],
+    "procedural_generation": {
+      "enabled": true,
+      "scope": ["dungeons", "quests", "loot", "events"],
+      "seed_based": true,
+      "description": "Endgame 'Fracture Rifts' — randomly generated instances with scaling difficulty, random elemental affixes, unique loot. Seeded and shareable. Weekly hand-curated challenge rifts for leaderboards."
+    }
+  },
+
+  "entities": {
+    "player": {
+      "visual_description": "Tall humanoid figures with an ethereal quality — faint elemental energy traces along their skin when abilities are used. Customizable body types, faces, and skin tones. Equipment visually changes appearance. Glyphs glow on equipped slots.",
+      "customization": { "body_types": ["slim", "athletic", "muscular", "stocky"], "facial_features": true, "hair_styles": 40, "skin_colors": 20, "equipment_visibility": true },
+      "stats": ["health", "mana", "stamina", "strength", "agility", "intellect", "resilience", "luck"],
+      "abilities": [
+        { "name": "Elemental Bolt", "description": "Basic ranged attack dealing damage based on equipped glyph element.", "cooldown_seconds": 0, "resource_cost": "5 mana" },
+        { "name": "Resonance Burst", "description": "AoE pulse of equipped element around the player.", "cooldown_seconds": 12, "resource_cost": "30 mana" },
+        { "name": "Glyph Surge", "description": "Empower next 3 abilities with +50% damage.", "cooldown_seconds": 30, "resource_cost": "50 mana" },
+        { "name": "Elemental Shift", "description": "Instantly swap active glyph set. 10s cooldown prevents constant swapping in combat.", "cooldown_seconds": 10, "resource_cost": "none" }
+      ]
+    },
+    "enemies": [
+      { "name": "Corrupted Treant", "type": "normal", "description": "Twisted tree creature animated by shadow corruption. Slow but hits hard.", "element": "shadow", "level_range": { "min": 5, "max": 15 }, "abilities": ["Root Slam", "Corruption Spit", "Branch Sweep"], "weaknesses": ["fire"], "resistances": ["nature", "physical_blunt"], "behavior": "territorial" },
+      { "name": "Magma Crawler", "type": "normal", "description": "Six-legged insect made of living lava. Fast and aggressive.", "element": "fire", "level_range": { "min": 22, "max": 35 }, "abilities": ["Lava Spit", "Charge", "Magma Trail"], "weaknesses": ["ice", "water"], "resistances": ["fire"], "behavior": "pack" },
+      { "name": "Crystal Wraith", "type": "elite", "description": "Floating arcane entity made of shattered crystal fragments. Teleports and fires prismatic beams.", "element": "arcane", "level_range": { "min": 40, "max": 55 }, "abilities": ["Prismatic Beam", "Blink", "Crystal Nova", "Mirror Image"], "weaknesses": ["physical_blunt"], "resistances": ["arcane", "lightning"], "behavior": "ambush" },
+      { "name": "Abyssal Serpent", "type": "elite", "description": "Massive sea serpent patrolling the Sunken Depths. Surfaces briefly to attack then submerges.", "element": "water", "level_range": { "min": 58, "max": 72 }, "abilities": ["Tidal Slam", "Whirlpool", "Depth Charge", "Submerge"], "weaknesses": ["lightning"], "resistances": ["water", "ice"], "behavior": "territorial" },
+      { "name": "Void Revenant", "type": "elite", "description": "A humanoid shadow that phases between reality and void. Appears and disappears unpredictably.", "element": "void", "level_range": { "min": 60, "max": 80 }, "abilities": ["Phase Shift", "Void Drain", "Reality Tear", "Shadow Clones"], "weaknesses": ["holy", "lightning"], "resistances": ["shadow", "void"], "behavior": "ambush" },
+      { "name": "Ignis Primordial", "type": "world_boss", "description": "A bound fire elemental the size of a cathedral. The forge itself is its body.", "element": "fire", "level_range": { "min": 50, "max": 50 }, "abilities": ["Lava Flood", "Hand Slam", "Fire Breath", "Eruption", "Inferno Wave"], "weaknesses": ["ice", "water"], "resistances": ["fire", "earth", "physical"], "behavior": "aggressive" },
+      { "name": "Abyssal Leviathan", "type": "world_boss", "description": "A sea creature so vast its body forms the ocean floor. Eye larger than a building.", "element": "water", "level_range": { "min": 70, "max": 70 }, "abilities": ["Tentacle Storm", "Swallow", "Depth Charge Barrage", "Abyssal Scream", "Surface Breach"], "weaknesses": ["lightning"], "resistances": ["water", "physical", "nature"], "behavior": "territorial" },
+      { "name": "Vorthak, The Unraveler", "type": "raid_boss", "description": "The void entity responsible for the Sundering. Exists partially outside reality.", "element": "void", "level_range": { "min": 80, "max": 80 }, "abilities": ["Reality Phase", "Unravel", "Void Rift", "Gravity Inversion", "Memory Wipe", "Existence Erasure"], "weaknesses": ["holy", "arcane"], "resistances": ["void", "shadow", "physical"], "behavior": "aggressive" }
+    ],
+    "items": {
+      "rarity_tiers": [
+        { "name": "Common", "color_hex": "#9d9d9d", "drop_rate_weight": 100 },
+        { "name": "Uncommon", "color_hex": "#1eff00", "drop_rate_weight": 50 },
+        { "name": "Rare", "color_hex": "#0070dd", "drop_rate_weight": 15 },
+        { "name": "Epic", "color_hex": "#a335ee", "drop_rate_weight": 5 },
+        { "name": "Legendary", "color_hex": "#ff8000", "drop_rate_weight": 1 },
+        { "name": "Mythic", "color_hex": "#e6cc80", "drop_rate_weight": 0.1 }
+      ],
+      "equipment_slots": ["head", "chest", "legs", "boots", "gloves", "main_hand", "off_hand", "ring1", "ring2", "amulet", "glyph_slot_1", "glyph_slot_2", "glyph_slot_3", "glyph_slot_4", "passive_glyph_1", "passive_glyph_2"],
+      "categories": [
+        { "name": "Weapons", "description": "All weapon types from greatswords to staves.", "examples": ["Flamebringer Greatsword", "Frostweaver Staff", "Stormcaller Bow"] },
+        { "name": "Armor", "description": "Protective gear across all armor types.", "examples": ["Obsidian Plate Chestguard", "Windwalker Leather Boots", "Voidweave Robes"] },
+        { "name": "Glyphs", "description": "Resonance Glyphs that define player abilities.", "examples": ["Glyph of Inferno", "Glyph of Frostbite", "Glyph of the Tempest"] },
+        { "name": "Consumables", "description": "Potions, food buffs, and utility items.", "examples": ["Greater Healing Potion", "Aether-infused Rations", "Scroll of Elemental Warding"] },
+        { "name": "Crafting Materials", "description": "Gathered and dropped materials for crafting.", "examples": ["Fire Essence Crystal", "Leviathan Scale", "Void-touched Ore"] }
+      ],
+      "enchanting_system": { "enabled": true, "description": "Enchant gear with elemental properties. Enchantments add visual effects and stat bonuses. Higher-tier enchantments risk failure and can destroy the item." }
+    }
+  },
+
+  "assets": {
+    "models_3d": [
+      { "name": "World Tree", "description": "Colossal tree trunk hundreds of feet wide with bioluminescent bark patterns. Roots extend like cathedral arches. Branches disappear into clouds above.", "environment": "Verdant Cradle", "tags": ["environment", "hero_prop"], "variants": 3 },
+      { "name": "Forge Eternal Hammer", "description": "A hammer the size of a building, made of volcanic obsidian and glowing fire runes. The head constantly drips molten metal.", "environment": "Molten Expanse", "tags": ["boss_prop", "weapon"], "variants": 1 },
+      { "name": "Crystal Spire Set", "description": "Collection of crystal formations from small shards to towering 100ft spires. Prismatic, translucent, internally lit.", "environment": "Crystal Hollows", "tags": ["environment", "modular"], "variants": 8 },
+      { "name": "Floating Peak Fragment", "description": "Section of mountain floating in mid-air with waterfalls cascading off edges into the void below. Snow-capped, rocky underside.", "environment": "Shattered Peaks", "tags": ["environment", "modular"], "variants": 6 },
+      { "name": "Drowned Warship", "description": "Massive elven warship encrusted with centuries of coral, barnacles, and bioluminescent sea life. Ornate elven carvings visible beneath growth.", "environment": "The Sunken Depths", "tags": ["dungeon", "hero_prop"], "variants": 1 },
+      { "name": "Resonance Glyph", "description": "Floating circular glyph design with elemental symbols. Glows with element-colored energy. Hovers and slowly rotates.", "tags": ["item", "vfx"], "variants": 12 },
+      { "name": "Aether Shard Currency", "description": "Small crystalline shards that glow with internal light. Each one pulses with elemental energy.", "tags": ["item", "currency"], "variants": 3 }
+    ],
+    "textures": [
+      { "name": "Barkskin Leather", "description": "Natural leather texture with bark-like grain patterns. Green-brown tones with subtle magical glow veins.", "tags": ["armor", "nature"] },
+      { "name": "Obsidian Plate", "description": "Polished volcanic glass surface — mirror-black with orange-red fire cracks visible through the material.", "tags": ["armor", "fire"] },
+      { "name": "Prismatic Crystal Surface", "description": "Refractive crystalline surface that shifts color based on viewing angle. Internal fractures create rainbow patterns.", "tags": ["environment", "arcane"] },
+      { "name": "Frost Iron", "description": "Metallic surface with ice crystal formations growing from it. Pale blue-white with condensation frost.", "tags": ["weapon", "ice"] },
+      { "name": "Void Corruption", "description": "Corrupted surface — healthy material breaking down into purple-black void energy. Cracks leak dark particle effects.", "tags": ["environment", "void", "corruption"] }
+    ],
+    "animations": [
+      { "name": "Elemental Cast — Fire", "description": "Character channels fire energy — hands pull back with flame particles, then thrust forward releasing a fire bolt.", "tags": ["combat", "cast", "fire"] },
+      { "name": "Elemental Cast — Ice", "description": "Character raises hand — frost crystals form in palm, then launches as an ice shard with frost trail.", "tags": ["combat", "cast", "ice"] },
+      { "name": "Glyph Swap", "description": "Character holds hand up — equipped glyphs glow and orbit around hand — then snaps into new configuration with a flash.", "tags": ["ability", "glyph"] },
+      { "name": "Glide — Hang Glider", "description": "Character deploys arcane glider from back and spreads arms. Wind animates clothing and hair.", "tags": ["movement", "glider"] }
+    ],
+    "audio": {
+      "music": [
+        { "name": "Verdant Cradle — Day", "mood": "peaceful, wonder, exploration", "description": "Soft orchestral with woodwinds, gentle strings, and ethereal harp arpeggios. Nature sounds woven in.", "loop": true, "environment": "Verdant Cradle" },
+        { "name": "Molten Expanse — Combat", "mood": "intense, driving, danger", "description": "Heavy percussion, war drums, low brass stabs, distorted guitar riffs. Fire crackle undertones.", "loop": true, "environment": "Molten Expanse" },
+        { "name": "Crystal Hollows — Ambient", "mood": "mysterious, ethereal, crystalline", "description": "Ambient pads with crystalline bell tones, gentle reverb, and harmonic overtone singing.", "loop": true, "environment": "Crystal Hollows" },
+        { "name": "Shattered Peaks — Summit", "mood": "epic, awe-inspiring, vast", "description": "Full orchestral crescendo with choir. Sweeping strings over howling wind sound design.", "loop": true, "environment": "Shattered Peaks" },
+        { "name": "Void's Cradle — Boss", "mood": "terrifying, dissonant, climactic", "description": "Dissonant strings, reverse cymbals, distorted choir, deep sub-bass pulses. Reality-breaking sound design.", "loop": true, "environment": "Void's Cradle" }
+      ],
+      "sfx": [
+        { "name": "Glyph Activate", "description": "Crystalline chime with a rising tone and soft energy pulse.", "trigger": "Player activates a glyph ability" },
+        { "name": "Elemental Resonance Combo", "description": "Harmonic collision — two elemental sounds merge into a powerful harmonic chord with a shockwave bass hit.", "trigger": "Two elements combine for a Resonance Reaction" },
+        { "name": "Lava Footstep", "description": "Heavy sizzling step with bubbling and heat hiss. Different from normal footsteps.", "trigger": "Walking on cooled lava in Molten Expanse" },
+        { "name": "Crystal Chime Walk", "description": "Musical tinkling — each step produces a slightly different pitch from crystal shards underfoot.", "trigger": "Walking in Crystal Hollows" }
+      ],
+      "ambient": [
+        { "name": "Forest Depths", "description": "Layered bird calls, wind through leaves, distant waterfalls, occasional tree creak, insect hum.", "environment": "Verdant Cradle" },
+        { "name": "Volcanic Rumble", "description": "Deep earth tremors, hissing steam, distant magma pops, crackling heat.", "environment": "Molten Expanse" },
+        { "name": "Underwater Silence", "description": "Muffled pressure, distant whale song, gentle current, bubbles rising.", "environment": "The Sunken Depths" }
+      ],
+      "voice": [
+        { "character": "World Tree Keeper (Quest NPC)", "voice_description": "Ancient, slow, resonant. Deep male voice with natural reverb as if speaking from inside a tree.", "sample_lines": ["The roots remember what the branches have forgotten.", "You seek the Glyph of Growth? Then prove you understand patience."] },
+        { "character": "Forgemaster Cinderveil (Boss)", "voice_description": "Raspy, intense female voice with metallic reverb and occasional crackle of fire.", "sample_lines": ["The forge does not forgive weakness!", "Let me show you true fire!"] },
+        { "character": "Vorthak, The Unraveler (Raid Boss)", "voice_description": "Dissonant multi-layered voice — sounds like three voices speaking slightly out of sync. Whisper and boom simultaneously.", "sample_lines": ["Reality is a thread. I am the scissors.", "Your existence is a rounding error."] }
+      ]
+    },
+    "vfx": [
+      { "name": "Fireball Projectile", "description": "Swirling fire sphere with trailing embers. Core is white-hot, outer layer is orange-red with smoke trail.", "tags": ["projectile", "fire"] },
+      { "name": "Resonance Combo — Steam Cloud", "description": "Expanding white-grey fog cloud with crackling lightning inside. Condensation drips from edges.", "tags": ["combo", "fire", "ice"] },
+      { "name": "Elemental Shift Effect", "description": "Character's equipped glyphs flash and orbit around them in a helix pattern before snapping to new positions.", "tags": ["ui_feedback", "glyph"] },
+      { "name": "Void Corruption Spread", "description": "Healthy ground cracks and purple-black void energy seeps through. Reality distortions ripple outward.", "tags": ["environment", "void", "corruption"] },
+      { "name": "Mythic Drop Glow", "description": "Item on ground radiates golden light with pulsing beam shooting into the sky. Particle cascade around it.", "tags": ["loot", "legendary"] }
+    ]
+  },
+
+  "logic": {
+    "quests": [
+      { "name": "The Weaver's Awakening", "type": "main_story", "description": "The player discovers their ability to channel elemental energy and receives their first Resonance Glyph.", "level_requirement": 1, "steps": [
+        { "order": 1, "description": "Find the shattered glyph in the ruins near Elderwood Grove.", "objective_type": "discover" },
+        { "order": 2, "description": "Bring the glyph shard to the World Tree Keeper.", "objective_type": "talk_to" },
+        { "order": 3, "description": "Attune to your first element at the Resonance Altar.", "objective_type": "solve_puzzle" },
+        { "order": 4, "description": "Test your new abilities on corrupted creatures in Mosshollow.", "objective_type": "kill" }
+      ], "rewards": { "xp": 500, "items": ["Novice Resonance Glyph (Nature)"], "unlock": "Glyph Attunement System" }, "branching": true },
+      { "name": "The Forge Eternal Chain", "type": "dungeon", "description": "A multi-part quest chain leading to the Forge Eternal dungeon. Unlocks fire-glyph crafting.", "level_requirement": 25, "prerequisites": ["The Weaver's Awakening"], "steps": [
+        { "order": 1, "description": "Investigate reports of missing dwarven miners near the Molten Expanse.", "objective_type": "explore" },
+        { "order": 2, "description": "Rescue trapped miners from magma crawler nests.", "objective_type": "escort" },
+        { "order": 3, "description": "Deliver forged key fragments to the Forgeheart Citadel elder.", "objective_type": "collect" },
+        { "order": 4, "description": "Enter The Forge Eternal and defeat Forgemaster Cinderveil.", "objective_type": "kill" }
+      ], "rewards": { "xp": 15000, "items": ["Legendary Fire Glyph — Cinderveil's Fury"], "unlock": "Fire Glyph Crafting" } },
+      { "name": "Corrupted Roots", "type": "side_quest", "description": "Druids in the Verdant Cradle are losing control of their territory to spreading corruption.", "level_requirement": 10, "steps": [
+        { "order": 1, "description": "Collect corruption samples from infected areas.", "objective_type": "collect" },
+        { "order": 2, "description": "Analyze them at the Elemental Academy.", "objective_type": "talk_to" },
+        { "order": 3, "description": "Purify 5 corrupted root nodes using nature-glyph abilities.", "objective_type": "solve_puzzle" }
+      ], "rewards": { "xp": 2000, "reputation": ["Verdant Circle +500"] }, "branching": false },
+      { "name": "The Shattered Heart Descent", "type": "main_story", "description": "Endgame quest chain culminating in the Void's Cradle raid. Reveals the truth behind the Sundering.", "level_requirement": 75, "steps": [
+        { "order": 1, "description": "Gather allies — speak to faction leaders across all 5 regions.", "objective_type": "talk_to" },
+        { "order": 2, "description": "Collect Void Ward fragments from each region's world boss.", "objective_type": "collect" },
+        { "order": 3, "description": "Assemble the Void Ward at the Shattered Heart.", "objective_type": "solve_puzzle" },
+        { "order": 4, "description": "Enter Void's Cradle and confront Vorthak.", "objective_type": "kill" }
+      ], "rewards": { "xp": 100000, "items": ["Mythic Glyph — Vorthak's Echo"], "unlock": "Server-wide world state change" }, "branching": true }
+    ],
+    "world_events": [
+      { "name": "Emberstorm Incursion", "type": "scheduled", "description": "Fire elementals breach the surface near Forgeheart Citadel. All players in the zone must push them back.", "rewards": ["Fire Essence Crystals", "Emberstorm Event Tokens"] },
+      { "name": "Void Rift Emergence", "type": "random", "description": "A void rift opens in a random zone. If not closed within 30 minutes, the zone becomes corrupted for 24 hours.", "rewards": ["Void-touched Materials", "Rare Glyph Fragments"] },
+      { "name": "The Grand Tournament", "type": "seasonal", "description": "Monthly PvP tournament at Skyreach Bastion. 1v1 and 3v3 brackets with cosmetic rewards.", "rewards": ["Tournament Champion Title", "Glowing Cosmetic Aura", "Resonance Coins"] }
+    ],
+    "crafting_recipes": [
+      { "name": "Obsidian Greatsword", "profession": "Blacksmithing", "skill_level_required": 200, "ingredients": [{ "item": "Obsidian Ore", "quantity": 12 }, { "item": "Fire Essence Crystal", "quantity": 3 }, { "item": "Ashen Iron Ingot", "quantity": 5 }], "result": "Obsidian Greatsword (Epic)", "result_quantity": 1 },
+      { "name": "Greater Healing Potion", "profession": "Alchemy", "skill_level_required": 100, "ingredients": [{ "item": "Moonpetal Herb", "quantity": 3 }, { "item": "Crystal Spring Water", "quantity": 1 }], "result": "Greater Healing Potion", "result_quantity": 3 },
+      { "name": "Glyph of the Tempest", "profession": "Runecrafting", "skill_level_required": 300, "ingredients": [{ "item": "Storm Crystal", "quantity": 5 }, { "item": "Resonance Shard", "quantity": 2 }, { "item": "Thunderbird Feather", "quantity": 1 }], "result": "Glyph of the Tempest (Legendary)", "result_quantity": 1 }
+    ]
+  },
+
+  "ui": {
+    "style": "Fantasy ornate with elemental themes. UI borders and frames change color based on player's dominant equipped element. Smooth transitions between states.",
+    "color_palette": {
+      "primary": "#1a1a2e",
+      "secondary": "#16213e",
+      "accent": "#e94560",
+      "background": "#0f0f23",
+      "text": "#eaeaea"
+    },
+    "hud_elements": [
+      { "name": "Health Globe", "position": "bottom_left", "description": "Circular health indicator with elemental glow. Pulses when low." },
+      { "name": "Mana Orb", "position": "bottom_left", "description": "Smaller orb next to health. Shows current mana pool. Color matches dominant element." },
+      { "name": "Stamina Bar", "position": "bottom_left", "description": "Horizontal bar under health/mana. Depletes on sprint, dodge, climb." },
+      { "name": "Glyph Bar", "position": "bottom_center", "description": "4 active glyph slots showing equipped abilities with cooldown overlays." },
+      { "name": "Mini-map", "position": "top_right", "description": "Circular mini-map with elemental terrain coloring. Shows nearby enemies, quests, and party members." },
+      { "name": "Target Frame", "position": "top_center", "description": "Shows targeted enemy name, level, health bar, and elemental affinity icon." },
+      { "name": "Chat Window", "position": "bottom_left", "description": "Tabbed chat with General, Party, Guild, Trade, and System channels." },
+      { "name": "Buff/Debuff Bar", "position": "top_left", "description": "Active status effects with duration timers. Icons enlarge for important debuffs." }
+    ],
+    "menus": [
+      { "name": "Character Sheet", "type": "character", "description": "Full character view with stats, equipped gear, glyph loadout, and appearance customization." },
+      { "name": "Inventory", "type": "inventory", "description": "Grid-based inventory with tabs for gear, consumables, materials, and glyphs. Drag-and-drop to equip." },
+      { "name": "Glyph Codex", "type": "inventory", "description": "Collection of all discovered glyphs. Shows element, abilities, and Resonance Combo interactions." },
+      { "name": "World Map", "type": "map", "description": "Full continent map showing regions, waypoints, dungeon entrances, and corruption status. Zoom to sub-area detail." },
+      { "name": "Quest Journal", "type": "quest_log", "description": "Active and completed quests with progress tracking. Main story quests highlighted." },
+      { "name": "Crafting Station", "type": "crafting", "description": "Profession-specific crafting interface. Shows recipes, required materials, and skill level." },
+      { "name": "Auction House", "type": "shop", "description": "Browse, search, buy, and sell items. Filter by category, rarity, price, and element." },
+      { "name": "Guild Hall", "type": "guild", "description": "Guild roster, treasury, territory control map, and guild progression perks." },
+      { "name": "Bestiary", "type": "lore_book", "description": "Encyclopedia of discovered enemies with lore, weakness info, drop tables, and kill counts." }
+    ],
+    "accessibility": {
+      "colorblind_modes": ["protanopia", "deuteranopia", "tritanopia"],
+      "subtitle_support": true,
+      "remappable_controls": true,
+      "screen_reader_support": true,
+      "font_scaling": true
+    }
+  }
+}

@@ -1,0 +1,995 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://forgedna.org/schema/v1.0.0/game_dna.schema.json",
+  "title": "ForgeDNA Game Schema",
+  "description": "A universal, engine-agnostic schema for defining complete game designs as lightweight JSON. Designed for human-AI collaboration: humans define creative vision, AI agents generate assets and code.",
+  "type": "object",
+  "required": ["meta", "mechanics", "world", "entities"],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference for validation."
+    },
+    "schema_version": {
+      "type": "string",
+      "const": "1.0.0",
+      "description": "ForgeDNA schema version."
+    },
+    "meta": {
+      "$ref": "#/definitions/Meta"
+    },
+    "mechanics": {
+      "$ref": "#/definitions/Mechanics"
+    },
+    "world": {
+      "$ref": "#/definitions/World"
+    },
+    "entities": {
+      "$ref": "#/definitions/Entities"
+    },
+    "assets": {
+      "$ref": "#/definitions/Assets"
+    },
+    "logic": {
+      "$ref": "#/definitions/Logic"
+    },
+    "ui": {
+      "$ref": "#/definitions/UI"
+    }
+  },
+  "definitions": {
+    "Meta": {
+      "type": "object",
+      "description": "High-level game identity and metadata.",
+      "required": ["title", "genre", "art_style"],
+      "additionalProperties": false,
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Game title."
+        },
+        "tagline": {
+          "type": "string",
+          "description": "One-line hook or elevator pitch."
+        },
+        "description": {
+          "type": "string",
+          "description": "Full game description (2-5 paragraphs)."
+        },
+        "genre": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "rpg", "mmorpg", "action", "adventure", "platformer",
+              "puzzle", "strategy", "simulation", "survival", "roguelike",
+              "fps", "tps", "horror", "racing", "sports", "sandbox",
+              "visual_novel", "tower_defense", "metroidvania",
+              "soulslike", "battle_royale", "moba", "card_game",
+              "rhythm", "stealth", "immersive_sim", "open_world"
+            ]
+          },
+          "description": "Game genre(s). Multiple genres define hybrid games."
+        },
+        "art_style": {
+          "type": "string",
+          "enum": [
+            "realistic", "stylized", "pixel_art_2d", "pixel_art_3d",
+            "low_poly", "cel_shaded", "hand_painted", "voxel",
+            "retro_16bit", "retro_8bit", "minimalist", "watercolor",
+            "comic_book", "anime", "photorealistic", "abstract",
+            "paper_cutout", "claymation", "ink_brush"
+          ],
+          "description": "Visual art direction."
+        },
+        "target_platforms": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["pc", "mac", "linux", "web", "android", "ios", "vr_quest", "vr_pcvr", "console_switch", "console_ps5", "console_xbox"]
+          },
+          "description": "Target deployment platforms."
+        },
+        "player_count": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "min": { "type": "integer", "minimum": 1 },
+            "max": { "type": "integer", "minimum": 1 },
+            "mode": {
+              "type": "string",
+              "enum": ["singleplayer", "coop", "pvp", "pve", "mmo"]
+            }
+          },
+          "description": "Player count and multiplayer mode."
+        },
+        "rating": {
+          "type": "string",
+          "enum": ["everyone", "teen", "mature", "adult"],
+          "description": "Target age/content rating."
+        },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Freeform tags for discovery (e.g., 'dark_fantasy', 'sci-fi', 'cozy', 'competitive')."
+        },
+        "inspiration": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Games or media that inspire this project."
+        }
+      }
+    },
+
+    "Mechanics": {
+      "type": "object",
+      "description": "Core gameplay mechanics and systems.",
+      "additionalProperties": false,
+      "properties": {
+        "movement": {
+          "$ref": "#/definitions/MovementSystem"
+        },
+        "combat": {
+          "$ref": "#/definitions/CombatSystem"
+        },
+        "crafting": {
+          "$ref": "#/definitions/CraftingSystem"
+        },
+        "progression": {
+          "$ref": "#/definitions/ProgressionSystem"
+        },
+        "economy": {
+          "$ref": "#/definitions/EconomySystem"
+        },
+        "custom_mechanics": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/CustomMechanic" },
+          "description": "Game-specific unique mechanics."
+        }
+      }
+    },
+
+    "MovementSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "types": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "walk", "run", "sprint", "sneak", "crouch",
+              "jump", "double_jump", "wall_jump", "wall_run",
+              "swim", "dive", "climb", "vault",
+              "fly", "glide", "hover", "grapple", "swing",
+              "dash", "dodge", "roll", "teleport",
+              "ride_mount", "drive_vehicle", "surf"
+            ]
+          },
+          "description": "Available movement types."
+        },
+        "physics_style": {
+          "type": "string",
+          "enum": ["realistic", "arcade", "floaty", "heavy", "snappy", "custom"],
+          "description": "Overall physics feel."
+        },
+        "mounts_vehicles": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["ground", "air", "water", "mixed"] },
+              "speed": { "type": "string", "enum": ["slow", "normal", "fast", "very_fast"] },
+              "description": { "type": "string" }
+            },
+            "required": ["name", "type"]
+          },
+          "description": "Rideable mounts and drivable vehicles."
+        }
+      }
+    },
+
+    "CombatSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "style": {
+          "type": "string",
+          "enum": ["real_time", "turn_based", "action_rpg", "tactical", "hack_and_slash", "soulslike", "tab_target", "hybrid"],
+          "description": "Primary combat style."
+        },
+        "damage_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "All damage types (e.g., 'physical', 'fire', 'ice', 'holy', 'void')."
+        },
+        "defense_types": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Defense/armor types (e.g., 'plate', 'leather', 'cloth', 'magical_barrier')."
+        },
+        "weapon_categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "damage_type": { "type": "string" },
+              "range": { "type": "string", "enum": ["melee", "close", "medium", "long", "extreme"] },
+              "speed": { "type": "string", "enum": ["very_slow", "slow", "normal", "fast", "very_fast"] },
+              "description": { "type": "string" }
+            },
+            "required": ["name"]
+          },
+          "description": "Weapon categories with combat properties."
+        },
+        "status_effects": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "element": { "type": "string" },
+              "effect": { "type": "string" },
+              "duration_type": { "type": "string", "enum": ["instant", "timed", "stacking", "permanent"] }
+            },
+            "required": ["name", "effect"]
+          },
+          "description": "All status effects (buffs, debuffs, DoTs, etc.)."
+        }
+      }
+    },
+
+    "CraftingSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "professions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Crafting professions (e.g., 'blacksmithing', 'alchemy', 'enchanting')."
+        },
+        "gathering_skills": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Resource gathering skills (e.g., 'mining', 'herbalism', 'skinning')."
+        },
+        "complexity": {
+          "type": "string",
+          "enum": ["simple", "moderate", "complex", "deep"],
+          "description": "How intricate the crafting system is."
+        }
+      }
+    },
+
+    "ProgressionSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["level_based", "skill_based", "class_based", "classless_hybrid", "metroidvania", "roguelike"],
+          "description": "Primary progression model."
+        },
+        "max_level": { "type": "integer" },
+        "skill_trees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "node_count_estimate": { "type": "integer" }
+            },
+            "required": ["name"]
+          },
+          "description": "Major skill/talent trees."
+        },
+        "respec_available": { "type": "boolean" }
+      }
+    },
+
+    "EconomySystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "currencies": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["primary", "premium", "event", "faction"] },
+              "description": { "type": "string" }
+            },
+            "required": ["name", "type"]
+          }
+        },
+        "player_trading": { "type": "boolean" },
+        "auction_house": { "type": "boolean" },
+        "player_owned_shops": { "type": "boolean" }
+      }
+    },
+
+    "CustomMechanic": {
+      "type": "object",
+      "required": ["name", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "description": { "type": "string" },
+        "rules": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Explicit rules governing this mechanic."
+        },
+        "interactions": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "How this mechanic interacts with other systems."
+        }
+      }
+    },
+
+    "World": {
+      "type": "object",
+      "description": "World structure, environments, and geography.",
+      "required": ["environments"],
+      "additionalProperties": false,
+      "properties": {
+        "scale": {
+          "type": "string",
+          "enum": ["tiny", "small", "medium", "large", "massive", "infinite"],
+          "description": "Overall world size."
+        },
+        "structure": {
+          "type": "string",
+          "enum": ["open_world", "hub_based", "level_based", "procedural", "metroidvania", "open_zone"],
+          "description": "How the world is organized."
+        },
+        "environments": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Environment" },
+          "minItems": 1,
+          "description": "All distinct environments/regions."
+        },
+        "dungeons": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Dungeon" },
+          "description": "Dungeon/instance definitions."
+        },
+        "procedural_generation": {
+          "$ref": "#/definitions/ProceduralGeneration"
+        },
+        "day_night_cycle": { "type": "boolean" },
+        "weather_system": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Weather types (e.g., 'clear', 'rain', 'storm', 'fog', 'blizzard')."
+        },
+        "time_of_day_effects": { "type": "boolean" }
+      }
+    },
+
+    "Environment": {
+      "type": "object",
+      "required": ["name", "type", "visual_description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": [
+            "forest", "jungle", "desert", "tundra", "plains", "mountains",
+            "swamp", "ocean", "underwater", "cave", "volcanic", "crystal",
+            "sky_island", "ruins", "city", "village", "castle", "dungeon",
+            "corrupted", "ethereal", "void", "underworld", "celestial",
+            "industrial", "futuristic", "alien", "dreamscape"
+          ]
+        },
+        "visual_description": {
+          "type": "string",
+          "description": "Detailed visual description for AI asset generation. Describe colors, mood, lighting, key features, atmosphere."
+        },
+        "audio_mood": {
+          "type": "string",
+          "description": "Audio atmosphere description (e.g., 'gentle wind through ancient trees, distant bird calls, subtle magical hum')."
+        },
+        "min_level": { "type": "integer" },
+        "max_level": { "type": "integer" },
+        "sub_areas": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" }
+            },
+            "required": ["name", "description"]
+          },
+          "description": "Named sub-locations within this environment."
+        },
+        "resources": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Gatherable resources found here."
+        },
+        "factions_present": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "NPC factions inhabiting this area."
+        },
+        "ambiance": {
+          "type": "object",
+          "properties": {
+            "lighting": { "type": "string" },
+            "fog": { "type": "string" },
+            "particles": { "type": "string" },
+            "sky": { "type": "string" }
+          },
+          "description": "Atmospheric visual properties."
+        }
+      }
+    },
+
+    "Dungeon": {
+      "type": "object",
+      "required": ["name", "difficulty", "visual_description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "difficulty": {
+          "type": "string",
+          "enum": ["easy", "normal", "hard", "very_hard", "extreme", "nightmare", "raid"]
+        },
+        "player_count": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer" },
+            "max": { "type": "integer" }
+          }
+        },
+        "visual_description": {
+          "type": "string",
+          "description": "Detailed visual description for AI generation."
+        },
+        "floors": { "type": "integer", "description": "Number of floors/levels." },
+        "boss_encounters": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "mechanics": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Unique boss fight mechanics."
+              },
+              "phases": { "type": "integer" }
+            },
+            "required": ["name", "description"]
+          }
+        },
+        "traps": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Trap types found in this dungeon."
+        },
+        "puzzles": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Puzzle types found in this dungeon."
+        },
+        "loot_tier": {
+          "type": "string",
+          "enum": ["common", "uncommon", "rare", "epic", "legendary", "mythic"]
+        },
+        "time_limit_minutes": { "type": "integer" },
+        "elemental_affinity": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Dominant elements in this dungeon."
+        }
+      }
+    },
+
+    "ProceduralGeneration": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "scope": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["terrain", "dungeons", "quests", "npcs", "loot", "weather", "events"]
+          },
+          "description": "What aspects are procedurally generated."
+        },
+        "seed_based": { "type": "boolean" },
+        "description": { "type": "string" }
+      }
+    },
+
+    "Entities": {
+      "type": "object",
+      "description": "All entity types: player, NPCs, enemies, items.",
+      "additionalProperties": false,
+      "properties": {
+        "player": {
+          "$ref": "#/definitions/PlayerEntity"
+        },
+        "npcs": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/EntityTemplate" },
+          "description": "Friendly/neutral NPC definitions."
+        },
+        "enemies": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/EnemyEntity" },
+          "description": "Enemy/monster definitions."
+        },
+        "items": {
+          "$ref": "#/definitions/ItemSystem"
+        }
+      }
+    },
+
+    "PlayerEntity": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "visual_description": { "type": "string" },
+        "customization": {
+          "type": "object",
+          "properties": {
+            "body_types": { "type": "array", "items": { "type": "string" } },
+            "facial_features": { "type": "boolean" },
+            "hair_styles": { "type": "integer", "description": "Approximate number of options." },
+            "skin_colors": { "type": "integer" },
+            "equipment_visibility": { "type": "boolean", "description": "Does gear visually appear on character?" }
+          }
+        },
+        "stats": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Core player stats (e.g., 'health', 'mana', 'stamina', 'strength', 'agility')."
+        },
+        "abilities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "element": { "type": "string" },
+              "cooldown_seconds": { "type": "number" },
+              "resource_cost": { "type": "string" }
+            },
+            "required": ["name", "description"]
+          }
+        }
+      }
+    },
+
+    "EnemyEntity": {
+      "type": "object",
+      "required": ["name", "type", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["normal", "elite", "mini_boss", "boss", "world_boss", "raid_boss"]
+        },
+        "description": { "type": "string" },
+        "visual_description": { "type": "string" },
+        "element": { "type": "string" },
+        "level_range": {
+          "type": "object",
+          "properties": {
+            "min": { "type": "integer" },
+            "max": { "type": "integer" }
+          }
+        },
+        "abilities": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Enemy attack/ability names."
+        },
+        "weaknesses": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "resistances": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "drops": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Notable loot drops."
+        },
+        "behavior": {
+          "type": "string",
+          "enum": ["passive", "territorial", "aggressive", "pack", "ambush", "patrol"],
+          "description": "Default AI behavior pattern."
+        }
+      }
+    },
+
+    "EntityTemplate": {
+      "type": "object",
+      "required": ["name", "role"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "role": {
+          "type": "string",
+          "enum": ["quest_giver", "merchant", "trainer", "guard", "civilian", "companion", "faction_leader", "lore_keeper", "craftsman"]
+        },
+        "description": { "type": "string" },
+        "visual_description": { "type": "string" },
+        "faction": { "type": "string" },
+        "dialogue_complexity": {
+          "type": "string",
+          "enum": ["simple", "branching", "dynamic_ai"]
+        }
+      }
+    },
+
+    "ItemSystem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "rarity_tiers": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "color_hex": { "type": "string" },
+              "drop_rate_weight": { "type": "number" }
+            },
+            "required": ["name"]
+          }
+        },
+        "equipment_slots": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Equipment slots (e.g., 'head', 'chest', 'legs', 'main_hand', 'off_hand', 'ring1', 'ring2', 'amulet')."
+        },
+        "categories": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "examples": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["name"]
+          }
+        },
+        "enchanting_system": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "description": { "type": "string" }
+          }
+        }
+      }
+    },
+
+    "Assets": {
+      "type": "object",
+      "description": "Asset definitions for AI generation. Descriptions only, no binary data.",
+      "additionalProperties": false,
+      "properties": {
+        "models_3d": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AssetDescriptor" },
+          "description": "3D model assets to generate."
+        },
+        "textures": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AssetDescriptor" },
+          "description": "Texture/surface assets."
+        },
+        "animations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AssetDescriptor" },
+          "description": "Animation assets."
+        },
+        "audio": {
+          "$ref": "#/definitions/AudioAssets"
+        },
+        "ui_elements": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AssetDescriptor" },
+          "description": "UI visual assets (icons, frames, backgrounds)."
+        },
+        "vfx": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AssetDescriptor" },
+          "description": "Visual effects (particles, shaders, post-processing)."
+        },
+        "skybox": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/AssetDescriptor" },
+          "description": "Skybox assets."
+        }
+      }
+    },
+
+    "AssetDescriptor": {
+      "type": "object",
+      "required": ["name", "description"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "description": {
+          "type": "string",
+          "description": "Detailed description for AI generation. Include style, colors, scale, mood, references."
+        },
+        "environment": { "type": "string", "description": "Associated environment name." },
+        "tags": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "lod_levels": {
+          "type": "integer",
+          "description": "Number of LOD variants to generate."
+        },
+        "variants": {
+          "type": "integer",
+          "description": "Number of visual variants (e.g., different barrel designs)."
+        }
+      }
+    },
+
+    "AudioAssets": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "music": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "mood": { "type": "string" },
+              "description": { "type": "string" },
+              "loop": { "type": "boolean" },
+              "environment": { "type": "string" }
+            },
+            "required": ["name", "mood", "description"]
+          }
+        },
+        "sfx": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "trigger": { "type": "string", "description": "When this sound plays." }
+            },
+            "required": ["name", "description"]
+          }
+        },
+        "ambient": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "environment": { "type": "string" }
+            },
+            "required": ["name", "description"]
+          }
+        },
+        "voice": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "character": { "type": "string" },
+              "voice_description": { "type": "string" },
+              "sample_lines": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            },
+            "required": ["character", "voice_description"]
+          }
+        }
+      }
+    },
+
+    "Logic": {
+      "type": "object",
+      "description": "Game logic definitions: quests, events, skill trees, recipes.",
+      "additionalProperties": false,
+      "properties": {
+        "quests": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Quest" }
+        },
+        "world_events": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["scheduled", "random", "triggered", "seasonal"] },
+              "description": { "type": "string" },
+              "rewards": { "type": "array", "items": { "type": "string" } }
+            },
+            "required": ["name", "type", "description"]
+          }
+        },
+        "skill_trees": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "description": { "type": "string" },
+              "nodes": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "name": { "type": "string" },
+                    "description": { "type": "string" },
+                    "tier": { "type": "integer" },
+                    "prerequisites": { "type": "array", "items": { "type": "string" } }
+                  },
+                  "required": ["name", "description", "tier"]
+                }
+              }
+            },
+            "required": ["name", "nodes"]
+          }
+        },
+        "crafting_recipes": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "profession": { "type": "string" },
+              "skill_level_required": { "type": "integer" },
+              "ingredients": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "item": { "type": "string" },
+                    "quantity": { "type": "integer" }
+                  },
+                  "required": ["item", "quantity"]
+                }
+              },
+              "result": { "type": "string" },
+              "result_quantity": { "type": "integer" }
+            },
+            "required": ["name", "ingredients", "result"]
+          }
+        }
+      }
+    },
+
+    "Quest": {
+      "type": "object",
+      "required": ["name", "description", "type"],
+      "additionalProperties": false,
+      "properties": {
+        "name": { "type": "string" },
+        "type": {
+          "type": "string",
+          "enum": ["main_story", "side_quest", "daily", "weekly", "event", "exploration", "crafting", "dungeon", "pvp", "hidden"]
+        },
+        "description": { "type": "string" },
+        "level_requirement": { "type": "integer" },
+        "prerequisites": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Quest names that must be completed first."
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "order": { "type": "integer" },
+              "description": { "type": "string" },
+              "objective_type": {
+                "type": "string",
+                "enum": ["talk_to", "kill", "collect", "explore", "escort", "defend", "solve_puzzle", "craft", "discover", "survive"]
+              }
+            },
+            "required": ["order", "description"]
+          }
+        },
+        "rewards": {
+          "type": "object",
+          "properties": {
+            "xp": { "type": "integer" },
+            "gold": { "type": "integer" },
+            "items": { "type": "array", "items": { "type": "string" } },
+            "reputation": { "type": "array", "items": { "type": "string" } },
+            "unlock": { "type": "string", "description": "Area, feature, or ability unlocked." }
+          }
+        },
+        "branching": { "type": "boolean", "description": "Does this quest have player choice branches?" }
+      }
+    },
+
+    "UI": {
+      "type": "object",
+      "description": "User interface design and layout.",
+      "additionalProperties": false,
+      "properties": {
+        "style": {
+          "type": "string",
+          "description": "Overall UI visual style (e.g., 'fantasy ornate', 'clean modern', 'sci-fi holographic', 'pixel retro')."
+        },
+        "color_palette": {
+          "type": "object",
+          "properties": {
+            "primary": { "type": "string" },
+            "secondary": { "type": "string" },
+            "accent": { "type": "string" },
+            "background": { "type": "string" },
+            "text": { "type": "string" }
+          }
+        },
+        "hud_elements": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "position": { "type": "string", "enum": ["top_left", "top_center", "top_right", "bottom_left", "bottom_center", "bottom_right", "left", "right", "center"] },
+              "description": { "type": "string" }
+            },
+            "required": ["name", "position"]
+          }
+        },
+        "menus": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": { "type": "string" },
+              "type": { "type": "string", "enum": ["main_menu", "pause", "inventory", "character", "map", "quest_log", "settings", "crafting", "shop", "social", "guild", "bestiary", "lore_book"] },
+              "description": { "type": "string" }
+            },
+            "required": ["name", "type"]
+          }
+        },
+        "accessibility": {
+          "type": "object",
+          "properties": {
+            "colorblind_modes": { "type": "array", "items": { "type": "string" } },
+            "subtitle_support": { "type": "boolean" },
+            "remappable_controls": { "type": "boolean" },
+            "screen_reader_support": { "type": "boolean" },
+            "font_scaling": { "type": "boolean" }
+          }
+        }
+      }
+    }
+  }
+}
