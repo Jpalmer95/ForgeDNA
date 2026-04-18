@@ -150,6 +150,168 @@ def dry_run(
 
 
 @app.command()
+def serve(
+    port: int = typer.Option(8080, "--port", "-p", help="Port to listen on"),
+    dna_file: Path = typer.Option(None, "--dna", "-d", help="Pre-load a GameDNA file"),
+):
+    """Start the MCP server for agent-driven game building."""
+    from .mcp_server import HarnessMCPServer, create_sse_app
+
+    server = HarnessMCPServer()
+
+    if dna_file:
+        result = server.parse_game_dna(str(dna_file))
+        if result["success"]:
+            console.print(f"[green]Pre-loaded: {result['title']}")
+        else:
+            console.print(f"[red]Failed to load: {result['error']}")
+
+    console.print(Panel(
+        f"MCP Server starting on port {port}\n\n"
+        f"Endpoints:\n"
+        f"  GET  /tools    — List available tools\n"
+        f"  POST /call     — Call a tool (JSON body)\n"
+        f"  POST /tools/{{name}} — Call tool by name\n\n"
+        f"Compatible with: Hermes Agent, Claude Code, LM Studio, any MCP client",
+        title="[bold green]ForgeDNA Harness MCP Server"
+    ))
+
+    try:
+        import uvicorn
+        app = create_sse_app(server)
+        uvicorn.run(app, host="0.0.0.0", port=port)
+    except ImportError:
+        console.print("[yellow]Install uvicorn for SSE support: pip install uvicorn fastapi")
+        console.print("[cyan]Falling back to interactive mode...")
+        _interactive_mode(server)
+
+
+def _interactive_mode(server):
+    """Interactive REPL for calling tools without an HTTP server."""
+    console.print("[cyan]Interactive mode. Type 'tools' to list tools, 'quit' to exit.\n")
+
+    while True:
+        try:
+            cmd = console.input("[bold cyan]>[/bold cyan] ").strip()
+        except (EOFError, KeyboardInterrupt):
+            break
+
+        if cmd in ("quit", "exit", "q"):
+            break
+        elif cmd == "tools":
+            tools = server.get_tools()
+            for t in tools:
+                console.print(f"  [green]{t['name']}[/green] — {t['description'][:60]}")
+        elif cmd.startswith("parse "):
+            result = server.parse_game_dna(cmd[6:].strip())
+            console.print_json(json.dumps(result, indent=2))
+        elif cmd.startswith("plan "):
+            result = server.generate_build_plan(cmd[5:].strip())
+            console.print_json(json.dumps(result, indent=2))
+        elif cmd.startswith("next "):
+            parts = cmd[5:].strip().split()
+            result = server.get_next_tasks(parts[0], parts[1] if len(parts) > 1 else "")
+            console.print_json(json.dumps(result, indent=2))
+        elif cmd.startswith("status "):
+            result = server.get_build_status(cmd[7:].strip())
+            console.print_json(json.dumps(result, indent=2))
+        elif cmd == "":
+            pass
+        else:
+            console.print("[dim]Commands: tools, parse <file>, plan <file>, next <plan_id>, status <plan_id>, quit")
+
+
+@app.command()
+def build(
+    dna_file: Path = typer.Argument(..., help="Path to game_dna.json file", exists=True),
+    output_dir: Path = typer.Option("./build_output", "--output", "-o", help="Output directory"),
+    max_parallel: int = typer.Option(4, "--parallel", "-j", help="Max parallel agents"),
+    dry_run_flag: bool = typer.Option(False, "--dry-run", help="Simulate without generating"),
+):
+    """Run an actual build using agent executors."""
+    from .executors import get_executor
+
+    dna = load_dna(dna_file)
+    build_plan = decompose(dna)
+    orch = Orchestrator(build_plan, str(output_dir))
+
+    console.print(Panel(
+        f"[bold]{dna.title}[/bold]\n"
+        f"Output: {output_dir}\n"
+        f"Tasks: {len(build_plan.tasks)}\n"
+        f"Max parallel: {max_parallel}",
+        title="[bold green]Starting Build"
+    ))
+
+    iteration = 0
+    while not orch.is_complete():
+        ready = orch.get_ready_tasks()
+        if not ready:
+            for task in build_plan.tasks:
+                if task.status.value == "pending":
+                    # Check if deps failed
+                    dep_failed = any(
+                        next((t for t in build_plan.tasks if t.task_id == d), None)
+                        and next((t for t in build_plan.tasks if t.task_id == d)).status.value == "failed"
+                        for d in task.dependencies
+                    )
+                    if dep_failed:
+                        orch.skip_task(task)
+                    else:
+                        orch.skip_task(task)
+            break
+
+        iteration += 1
+        batch = ready[:max_parallel]
+
+        console.print(f"\n[bold]━━━ Iteration {iteration} — {len(batch)} tasks ━━━[/bold]")
+
+        for task in batch:
+            orch.start_task(task)
+            spec = AGENT_REGISTRY[task.agent_type]
+
+            if dry_run_flag:
+                console.print(f"  [yellow]DRY[/yellow] {task.name} [{spec.name}]")
+                orch.complete_task(task, f"{output_dir}/{task.task_id}")
+            else:
+                console.print(f"  [cyan]RUN[/cyan] {task.name} [{spec.name}]")
+
+                executor = get_executor(task.agent_type, str(output_dir))
+                if executor:
+                    try:
+                        result = executor.execute(task)
+                        if result["success"]:
+                            orch.complete_task(task, result.get("output_path", ""))
+                            console.print(f"  [green]OK[/green]  → {result.get('output_path', 'done')}")
+                        else:
+                            orch.fail_task(task, result.get("error", "unknown"))
+                            console.print(f"  [red]FAIL[/red] {result.get('error', 'unknown')}")
+                    except Exception as e:
+                        orch.fail_task(task, str(e))
+                        console.print(f"  [red]ERR[/red]  {e}")
+                else:
+                    console.print(f"  [yellow]SKIP[/yellow] (no executor for {task.agent_type.value})")
+                    orch.complete_task(task, "")
+
+    # Final report
+    report = orch.generate_execution_report()
+    console.print(Panel(
+        f"Total: {report['total_tasks']}\n"
+        f"Completed: [green]{report['completed']}[/green]\n"
+        f"Failed: [red]{report['failed']}[/red]\n"
+        f"Skipped: [yellow]{report['skipped']}[/yellow]\n"
+        f"Progress: [cyan]{report['completion_pct']}%[/cyan]",
+        title="[bold green]Build Complete"
+    ))
+
+    # Save plan
+    plan_path = Path(output_dir) / "build_plan.json"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    orch.save_plan(str(plan_path))
+    console.print(f"\n[cyan]Build plan saved to {plan_path}")
+
+
+@app.command()
 def agents():
     """List all available agent types and their capabilities."""
     table = Table(title="Available Agent Types")
