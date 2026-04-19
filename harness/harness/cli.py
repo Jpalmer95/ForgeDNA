@@ -312,6 +312,105 @@ def build(
 
 
 @app.command()
+def build_full(
+    dna_file: Path = typer.Argument(..., help="Path to game_dna.json file", exists=True),
+    output_dir: Path = typer.Option("./build_output", "--output", "-o", help="Output directory"),
+    engine: str = typer.Option("godot", "--engine", "-e", help="Target engine (godot)"),
+    max_parallel: int = typer.Option(4, "--parallel", "-j", help="Max parallel agents"),
+    backend: str = typer.Option("dry_run", "--backend", "-b", help="Default agent backend (dry_run, subprocess, api, hf)"),
+    claude: bool = typer.Option(False, "--claude", help="Use Claude Code as the code agent"),
+    api_provider: str = typer.Option("", "--api-provider", help="API provider (openai, anthropic)"),
+    api_model: str = typer.Option("", "--api-model", help="API model name"),
+    api_key_env: str = typer.Option("", "--api-key-env", help="Env var with API key"),
+):
+    """Full build pipeline: DNA → Tasks → Agents → Engine Project → Playable Game."""
+    from .agents.build_manager import BuildManager, BuildConfig, AgentConfig, AgentBackend
+    from .engine_adapters import get_adapter
+
+    # Build agent configs
+    agent_configs = {}
+    if claude:
+        for code_type in ["code_player", "code_enemy", "code_combat", "code_quest", "code_crafting", "code_ui", "code_world"]:
+            agent_configs[code_type] = AgentConfig(
+                name="Claude Code", backend=AgentBackend.SUBPROCESS,
+                command="claude", args_template=["--acp", "--stdio"],
+            )
+    elif api_provider and api_model:
+        for code_type in ["code_player", "code_enemy", "code_combat", "code_quest", "code_crafting", "code_ui", "code_world"]:
+            agent_configs[code_type] = AgentConfig(
+                name=f"API ({api_provider})", backend=AgentBackend.API,
+                api_provider=api_provider, api_model=api_model,
+                api_key_env=api_key_env or f"{api_provider.upper()}_API_KEY",
+            )
+
+    config = BuildConfig(
+        dna_file=str(dna_file),
+        output_dir=str(output_dir),
+        max_parallel=max_parallel,
+        dry_run=(backend == "dry_run"),
+        engine=engine,
+        agent_configs=agent_configs,
+        default_backend=AgentBackend(backend),
+    )
+
+    manager = BuildManager(config)
+    prep = manager.prepare()
+
+    console.print(Panel(
+        f"[bold]{prep['game_title']}[/bold]\n"
+        f"Engine: {engine}\n"
+        f"Tasks: {prep['total_tasks']}\n"
+        f"Agents: {prep['agents_available']}/{prep['agents_total']} available\n"
+        f"Output: {output_dir}",
+        title="[bold green]Full Build Pipeline"
+    ))
+
+    # Phase 1: Execute agent tasks
+    console.print("\n[bold cyan]━━━ Phase 1: Agent Execution ━━━[/bold cyan]")
+    report = manager.execute()
+
+    console.print(Panel(
+        f"Completed: [green]{report['completed']}[/green]\n"
+        f"Failed: [red]{report['failed']}[/red]\n"
+        f"Skipped: [yellow]{report['skipped']}[/yellow]\n"
+        f"Time: [cyan]{report['elapsed_seconds']}s[/cyan]\n"
+        f"Iterations: {report['iterations']}",
+        title="[bold green]Agent Phase Complete"
+    ))
+
+    # Phase 2: Generate engine project
+    console.print("\n[bold cyan]━━━ Phase 2: Engine Project Generation ━━━[/bold cyan]")
+    from .dna_parser import load_dna as load_dna2
+    dna = load_dna2(str(dna_file))
+    adapter = get_adapter(engine, dna, str(output_dir))
+    engine_result = adapter.generate_all()
+
+    console.print(Panel(
+        f"Engine: {engine_result['engine']}\n"
+        f"Project: {engine_result['project_dir']}\n"
+        f"Files: {engine_result['total_files']}",
+        title="[bold green]Engine Project Generated"
+    ))
+
+    # Show generated files
+    table = Table(title="Generated Project Files")
+    table.add_column("File", style="cyan")
+    for f in engine_result["files_created"][:20]:
+        table.add_row(f)
+    if engine_result["total_files"] > 20:
+        table.add_row(f"... and {engine_result['total_files'] - 20} more")
+    console.print(table)
+
+    console.print(Panel(
+        f"[bold green]Build Complete![/bold green]\n\n"
+        f"Project: {engine_result['project_dir']}\n"
+        f"Open in Godot 4.x to play!\n\n"
+        f"[dim]godot --path {engine_result['project_dir']}",
+        title="🎮 Ready to Play"
+    ))
+
+
+@app.command()
 def agents():
     """List all available agent types and their capabilities."""
     table = Table(title="Available Agent Types")

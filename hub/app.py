@@ -908,6 +908,7 @@ def build_app():
 
 
 # HF Spaces requires a top-level demo/app variable
+# Rebuild trigger
 demo = build_app()
 
 if __name__ == "__main__":
