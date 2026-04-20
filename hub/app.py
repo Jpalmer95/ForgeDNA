@@ -38,7 +38,7 @@ SECTIONS = ["meta", "mechanics", "world", "entities", "assets", "logic", "ui"]
 
 
 def _dna_card_html(item: dict) -> str:
-    """Generate an HTML card for a DNA file — with selectable filename."""
+    """Generate an HTML card for a DNA file — visual display only."""
     genres = ", ".join(item.get("genre", [])) or "—"
     tags_html = " ".join(
         f'<span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:12px;font-size:0.75rem;margin:2px;">{t}</span>'
@@ -46,20 +46,20 @@ def _dna_card_html(item: dict) -> str:
     )
     filename = item.get("filename", "")
     return f"""
-    <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:8px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <div style="border:1px solid #d1d5db;border-radius:12px;padding:16px;margin:8px 0;background:#ffffff;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-            <h3 style="margin:0;color:#1e293b;font-size:1.1rem;">{item.get('title', 'Untitled')}</h3>
+            <h3 style="margin:0;color:#111827;font-size:1.1rem;font-weight:700;">{item.get('title', 'Untitled')}</h3>
             <span style="background:{'#dbeafe' if item['source']=='local' else '#fef3c7'};color:#1e40af;padding:2px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;">{item['source']}</span>
         </div>
-        <p style="color:#64748b;margin:4px 0 8px;font-style:italic;">{item.get('tagline', '')}</p>
-        <div style="font-size:0.8rem;color:#475569;">
+        <p style="color:#374151;margin:4px 0 8px;font-style:italic;">{item.get('tagline', '')}</p>
+        <div style="font-size:0.8rem;color:#1f2937;">
             <strong>Genre:</strong> {genres} &nbsp;|&nbsp;
             <strong>Art:</strong> {item.get('art_style', '—')} &nbsp;|&nbsp;
             <strong>Complexity:</strong> {item.get('complexity', '—')}
         </div>
         <div style="margin-top:8px;">{tags_html}</div>
-        <div style="margin-top:8px;font-size:0.75rem;color:#64748b;">
-            📄 <code style="background:#f1f5f9;padding:1px 6px;border-radius:4px;cursor:text;user-select:all;">{filename}</code>
+        <div style="margin-top:8px;font-size:0.75rem;color:#6b7280;">
+            📄 <code style="background:#f3f4f6;padding:1px 6px;border-radius:4px;color:#374151;">{filename}</code>
         </div>
     </div>
     """
@@ -465,8 +465,20 @@ def _summary_html(s: dict) -> str:
 # ---------------------------------------------------------------------------
 # We store the currently-loaded DNA in a state variable
 
+def _extract_filename_from_radio(radio_value):
+    """Extract filename from radio selection like 'Title — `filename`'."""
+    if not radio_value:
+        return None
+    # Extract filename from backticks
+    import re
+    match = re.search(r'`([^`]+)`', radio_value)
+    if match:
+        return match.group(1)
+    return None
+
+
 def _refresh_gallery(genre_filter, style_filter, complexity_filter):
-    """Refresh the browse gallery with filters — also updates dropdown choices."""
+    """Refresh the browse gallery with filters — also updates dropdown and radio choices."""
     files = list_dna_files()
     if genre_filter:
         files = [f for f in files if genre_filter in f.get("genre", [])]
@@ -475,13 +487,23 @@ def _refresh_gallery(genre_filter, style_filter, complexity_filter):
     if complexity_filter:
         files = [f for f in files if f.get("complexity") == complexity_filter]
 
+    all_files = list_dna_files()
+    radio_choices = [f"{f.get('title', 'Untitled')} — `{f['filename']}`" for f in all_files]
+    dropdown_choices = [f["filename"] for f in all_files]
+
     if not files:
-        return "<div style='text-align:center;padding:40px;color:#94a3b8;'>No game DNA files found matching filters.</div>", gr.update(choices=[f["filename"] for f in list_dna_files()])
+        return (
+            "<div style='text-align:center;padding:40px;color:#374151;'>No game DNA files found matching filters.</div>",
+            gr.update(choices=dropdown_choices),
+            gr.update(choices=radio_choices),
+        )
 
     cards = "".join(_dna_card_html(f) for f in files)
-    all_files = list_dna_files()
-    choices = [f["filename"] for f in all_files]
-    return f"<div>{cards}</div>", gr.update(choices=choices)
+    return (
+        f"<div>{cards}</div>",
+        gr.update(choices=dropdown_choices),
+        gr.update(choices=radio_choices),
+    )
 
 
 def _view_dna(filename):
@@ -639,11 +661,20 @@ def build_app():
 
             gr.Markdown("---")
             gr.Markdown("### 👁️ View DNA Details")
+            gr.Markdown("Click a game title below to view its details:")
+            file_choices = [f"{f.get('title', 'Untitled')} — `{f['filename']}`" for f in list_dna_files()]
+            file_radio = gr.Radio(
+                label="Select a game to view",
+                choices=file_choices,
+                value=None,
+                interactive=True,
+            )
             with gr.Row():
                 dna_select = gr.Dropdown(
-                    label="Select a DNA file to view (auto-opens on selection)",
+                    label="Or select by filename",
                     choices=[f["filename"] for f in list_dna_files()],
                     value=None,
+                    visible=True,
                 )
                 view_btn = gr.Button("View Details", variant="primary")
 
@@ -802,13 +833,13 @@ def build_app():
         refresh_btn.click(
             _refresh_gallery,
             inputs=[genre_dd, style_dd, complexity_dd],
-            outputs=[gallery_html, dna_select],
+            outputs=[gallery_html, dna_select, file_radio],
         )
         # Auto-refresh on load
         app.load(
             _refresh_gallery,
             inputs=[genre_dd, style_dd, complexity_dd],
-            outputs=[gallery_html, dna_select],
+            outputs=[gallery_html, dna_select, file_radio],
         )
 
         view_btn.click(
@@ -835,6 +866,33 @@ def build_app():
         dna_select.change(
             _view_dna,
             inputs=[dna_select],
+            outputs=[
+                view_container,
+                view_header,
+                view_md_all,
+                view_md_meta,
+                view_md_mechanics,
+                view_md_world,
+                view_md_entities,
+                view_md_assets,
+                view_md_logic,
+                view_md_ui,
+                summary_html,
+                view_json,
+                current_dna,
+            ],
+        )
+
+        # Auto-view when Radio selection changes
+        def _on_radio_select(radio_value):
+            filename = _extract_filename_from_radio(radio_value)
+            if filename:
+                return _view_dna(filename)
+            return (gr.update(visible=False), "", "", "", "", "", "", "", "", "", {}, "{}", None)
+
+        file_radio.change(
+            _on_radio_select,
+            inputs=[file_radio],
             outputs=[
                 view_container,
                 view_header,
@@ -934,19 +992,17 @@ def build_app():
             outputs=[upload_info, upload_json, upload_summary, upload_dna_state],
         )
 
-        # Upload tab — save also refreshes the Browse gallery and dropdown
+        # Upload tab — save also refreshes the Browse gallery, dropdown, and radio
         def _on_upload_save(dna, _ignored, genre_f, style_f, complexity_f):
             """Save uploaded DNA and refresh the gallery."""
-            from storage import upload_dna
             status = _on_save_to_hub(dna, _ignored)
-            # Also refresh gallery and dropdown
-            gallery, dropdown = _refresh_gallery(genre_f, style_f, complexity_f)
-            return status, gallery, dropdown
+            gallery, dropdown, radio = _refresh_gallery(genre_f, style_f, complexity_f)
+            return status, gallery, dropdown, radio
 
         upload_save_btn.click(
             _on_upload_save,
             inputs=[upload_dna_state, gr.Textbox(value="", visible=False), genre_dd, style_dd, complexity_dd],
-            outputs=[upload_status, gallery_html, dna_select],
+            outputs=[upload_status, gallery_html, dna_select, file_radio],
         )
 
         upload_md_btn.click(
