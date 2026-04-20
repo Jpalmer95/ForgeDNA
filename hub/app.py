@@ -38,14 +38,18 @@ SECTIONS = ["meta", "mechanics", "world", "entities", "assets", "logic", "ui"]
 
 
 def _dna_card_html(item: dict) -> str:
-    """Generate an HTML card for a DNA file."""
+    """Generate an HTML card for a DNA file — clickable to view details."""
     genres = ", ".join(item.get("genre", [])) or "—"
     tags_html = " ".join(
         f'<span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:12px;font-size:0.75rem;margin:2px;">{t}</span>'
         for t in item.get("tags", [])[:5]
     )
+    filename = item.get("filename", "")
     return f"""
-    <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:8px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <div onclick="document.querySelector('#dna_select input').value='{filename}'; document.querySelector('#dna_select input').dispatchEvent(new Event('input', {{bubbles:true}})); document.querySelector('#view_btn').click();"
+         style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:8px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);cursor:pointer;transition:box-shadow 0.2s;"
+         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';this.style.borderColor='#6366f1';"
+         onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)';this.style.borderColor='#e2e8f0';">
         <div style="display:flex;justify-content:space-between;align-items:center;">
             <h3 style="margin:0;color:#1e293b;font-size:1.1rem;">{item.get('title', 'Untitled')}</h3>
             <span style="background:{'#dbeafe' if item['source']=='local' else '#fef3c7'};color:#1e40af;padding:2px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;">{item['source']}</span>
@@ -57,6 +61,7 @@ def _dna_card_html(item: dict) -> str:
             <strong>Complexity:</strong> {item.get('complexity', '—')}
         </div>
         <div style="margin-top:8px;">{tags_html}</div>
+        <div style="margin-top:8px;font-size:0.75rem;color:#6366f1;">Click to view details →</div>
     </div>
     """
 
@@ -462,7 +467,7 @@ def _summary_html(s: dict) -> str:
 # We store the currently-loaded DNA in a state variable
 
 def _refresh_gallery(genre_filter, style_filter, complexity_filter):
-    """Refresh the browse gallery with filters."""
+    """Refresh the browse gallery with filters — also updates dropdown choices."""
     files = list_dna_files()
     if genre_filter:
         files = [f for f in files if genre_filter in f.get("genre", [])]
@@ -472,10 +477,12 @@ def _refresh_gallery(genre_filter, style_filter, complexity_filter):
         files = [f for f in files if f.get("complexity") == complexity_filter]
 
     if not files:
-        return "<div style='text-align:center;padding:40px;color:#94a3b8;'>No game DNA files found matching filters.</div>"
+        return "<div style='text-align:center;padding:40px;color:#94a3b8;'>No game DNA files found matching filters.</div>", gr.update(choices=[f["filename"] for f in list_dna_files()])
 
     cards = "".join(_dna_card_html(f) for f in files)
-    return f"<div>{cards}</div>"
+    all_files = list_dna_files()
+    choices = [f["filename"] for f in all_files]
+    return f"<div>{cards}</div>", gr.update(choices=choices)
 
 
 def _view_dna(filename):
@@ -769,9 +776,12 @@ def build_app():
 
             ### Links
 
-            - Schema: `cli/forgedna/schemas/game_dna.schema.json`
-            - Examples: `examples/` directory
-            - CLI: `cli/` directory
+            - **Website:** [forgedna.org](https://forgedna.org)
+            - **GitHub:** [github.com/Jpalmer95/ForgeDNA](https://github.com/Jpalmer95/ForgeDNA)
+            - **Schema:** `schema/game_dna.schema.json`
+            - **CLI Tool:** `cli/` directory
+            - **Substrate Harness:** `harness/` directory
+            - **Walkthrough:** `docs/WALKTHROUGH.md`
             """)
 
         # ================================================================
@@ -782,13 +792,13 @@ def build_app():
         refresh_btn.click(
             _refresh_gallery,
             inputs=[genre_dd, style_dd, complexity_dd],
-            outputs=[gallery_html],
+            outputs=[gallery_html, dna_select],
         )
         # Auto-refresh on load
         app.load(
             _refresh_gallery,
             inputs=[genre_dd, style_dd, complexity_dd],
-            outputs=[gallery_html],
+            outputs=[gallery_html, dna_select],
         )
 
         view_btn.click(
@@ -892,10 +902,19 @@ def build_app():
             outputs=[upload_info, upload_json, upload_summary, upload_dna_state],
         )
 
+        # Upload tab — save also refreshes the Browse gallery and dropdown
+        def _on_upload_save(dna, _ignored, genre_f, style_f, complexity_f):
+            """Save uploaded DNA and refresh the gallery."""
+            from storage import upload_dna
+            status = _on_save_to_hub(dna, _ignored)
+            # Also refresh gallery and dropdown
+            gallery, dropdown = _refresh_gallery(genre_f, style_f, complexity_f)
+            return status, gallery, dropdown
+
         upload_save_btn.click(
-            _on_save_to_hub,
-            inputs=[upload_dna_state, gr.Textbox(value="", visible=False)],
-            outputs=[upload_status],
+            _on_upload_save,
+            inputs=[upload_dna_state, gr.Textbox(value="", visible=False), genre_dd, style_dd, complexity_dd],
+            outputs=[upload_status, gallery_html, dna_select],
         )
 
         upload_md_btn.click(
