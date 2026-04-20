@@ -38,7 +38,7 @@ SECTIONS = ["meta", "mechanics", "world", "entities", "assets", "logic", "ui"]
 
 
 def _dna_card_html(item: dict) -> str:
-    """Generate an HTML card for a DNA file — clickable to view details."""
+    """Generate an HTML card for a DNA file — with selectable filename."""
     genres = ", ".join(item.get("genre", [])) or "—"
     tags_html = " ".join(
         f'<span style="background:#e0e7ff;color:#3730a3;padding:2px 8px;border-radius:12px;font-size:0.75rem;margin:2px;">{t}</span>'
@@ -46,10 +46,7 @@ def _dna_card_html(item: dict) -> str:
     )
     filename = item.get("filename", "")
     return f"""
-    <div onclick="document.querySelector('#dna_select input').value='{filename}'; document.querySelector('#dna_select input').dispatchEvent(new Event('input', {{bubbles:true}})); document.querySelector('#view_btn').click();"
-         style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:8px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);cursor:pointer;transition:box-shadow 0.2s;"
-         onmouseover="this.style.boxShadow='0 4px 12px rgba(0,0,0,0.15)';this.style.borderColor='#6366f1';"
-         onmouseout="this.style.boxShadow='0 1px 3px rgba(0,0,0,0.08)';this.style.borderColor='#e2e8f0';">
+    <div style="border:1px solid #e2e8f0;border-radius:12px;padding:16px;margin:8px 0;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,0.08);">
         <div style="display:flex;justify-content:space-between;align-items:center;">
             <h3 style="margin:0;color:#1e293b;font-size:1.1rem;">{item.get('title', 'Untitled')}</h3>
             <span style="background:{'#dbeafe' if item['source']=='local' else '#fef3c7'};color:#1e40af;padding:2px 10px;border-radius:12px;font-size:0.7rem;font-weight:600;">{item['source']}</span>
@@ -61,7 +58,9 @@ def _dna_card_html(item: dict) -> str:
             <strong>Complexity:</strong> {item.get('complexity', '—')}
         </div>
         <div style="margin-top:8px;">{tags_html}</div>
-        <div style="margin-top:8px;font-size:0.75rem;color:#6366f1;">Click to view details →</div>
+        <div style="margin-top:8px;font-size:0.75rem;color:#64748b;">
+            📄 <code style="background:#f1f5f9;padding:1px 6px;border-radius:4px;cursor:text;user-select:all;">{filename}</code>
+        </div>
     </div>
     """
 
@@ -492,7 +491,7 @@ def _view_dna(filename):
         return (
             gr.update(visible=False),
             "Could not load file.",
-            "", "", "", "", "", "", "",
+            "", "", "", "", "", "", "", "",
             {},
             json.dumps({"error": "file not found"}, indent=2),
             None,
@@ -502,9 +501,17 @@ def _view_dna(filename):
     is_valid, errors = validate(dna)
     valid_text = "✅ Valid" if is_valid else f"⚠️ {len(errors)} validation issues"
 
+    # Build full DNA markdown
+    full_md = f"# {meta.get('title', 'Untitled')}\n\n"
+    full_md += f"*{meta.get('tagline', '')}*\n\n"
+    full_md += f"**Description:** {meta.get('description', 'N/A')}\n\n"
+    for section in ["meta", "mechanics", "world", "entities", "assets", "logic", "ui"]:
+        full_md += f"\n---\n\n{_section_md(dna, section)}\n"
+
     return (
         gr.update(visible=True),
         f"## {meta.get('title', 'Untitled')}\n*{meta.get('tagline', '')}*\n\n{valid_text}",
+        full_md,
         _section_md(dna, "meta"),
         _section_md(dna, "mechanics"),
         _section_md(dna, "world"),
@@ -634,7 +641,7 @@ def build_app():
             gr.Markdown("### 👁️ View DNA Details")
             with gr.Row():
                 dna_select = gr.Dropdown(
-                    label="Select a DNA file to view",
+                    label="Select a DNA file to view (auto-opens on selection)",
                     choices=[f["filename"] for f in list_dna_files()],
                     value=None,
                 )
@@ -645,6 +652,9 @@ def build_app():
                 view_header = gr.Markdown("")
                 summary_html = gr.HTML(value="")
                 with gr.Tabs():
+                    view_tab_all = gr.Tab("🧬 Full DNA")
+                    with view_tab_all:
+                        view_md_all = gr.Markdown("")
                     view_tab_mechanics = gr.Tab("🔧 Mechanics")
                     with view_tab_mechanics:
                         view_md_mechanics = gr.Markdown("")
@@ -807,6 +817,28 @@ def build_app():
             outputs=[
                 view_container,
                 view_header,
+                view_md_all,
+                view_md_meta,
+                view_md_mechanics,
+                view_md_world,
+                view_md_entities,
+                view_md_assets,
+                view_md_logic,
+                view_md_ui,
+                summary_html,
+                view_json,
+                current_dna,
+            ],
+        )
+
+        # Also auto-view when dropdown selection changes
+        dna_select.change(
+            _view_dna,
+            inputs=[dna_select],
+            outputs=[
+                view_container,
+                view_header,
+                view_md_all,
                 view_md_meta,
                 view_md_mechanics,
                 view_md_world,
