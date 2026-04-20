@@ -1,0 +1,476 @@
+{
+  "$schema": "../game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "title": "Crown of Embers",
+    "tagline": "The old fire died. You are the spark that remains.",
+    "description": "A single-player dark fantasy action RPG set on the Shattered Continent — a land broken when the Ember Crown, a relic of divine flame, was sundered into seven shards and scattered across the world. Each shard corrupted the land around it, twisting nature and mortals into monstrous forms. You are an Emberborn — a soul marked by the Crown's dying light, able to wield elemental magic through ancient Runes found in the world. Journey through five vast, hostile regions to reclaim the shards, confront the Wardens who guard them, and decide whether to restore the Crown's fire or let the world burn and be reborn. No classes — your abilities are defined by which Runes you attune and how you combine them. A swordmaster can become a storm mage by swapping runes at a bonfire. The world rewards exploration, preparation, and mastery of its deep combat system.",
+    "genre": ["rpg", "action", "open_world", "soulslike"],
+    "art_style": "stylized",
+    "target_platforms": ["pc", "ps5", "xbox"],
+    "player_count": { "min": 1, "max": 1, "mode": "singleplayer" },
+    "rating": "teen",
+    "tags": ["dark_fantasy", "elemental_magic", "soulslike", "open_world", "exploration", "difficult", "crafting", "runes", "lore_heavy", "boss_fights"],
+    "inspiration": ["Elden Ring", "Dark Souls", "Breath of the Wild", "Dragon's Dogma", "Shadow of the Colossus", "Hollow Knight"]
+  },
+
+  "mechanics": {
+    "movement": {
+      "types": ["walk", "run", "sprint", "sneak", "jump", "climb", "swim", "dodge", "roll", "dash", "ride_mount"],
+      "physics_style": "heavy",
+      "mounts_vehicles": [
+        { "name": "Ashbound Stag", "type": "ground", "speed": "fast", "description": "A pale white elk with ember-lit antlers. Found in the Pale Reach. Can leap across small chasms." },
+        { "name": "Ravenscourge Hawk", "type": "air", "speed": "fast", "description": "A massive black raven tamed at the Sky Perch. Glides from elevated points. Cannot truly fly." },
+        { "name": "Ironclad Boar", "type": "ground", "speed": "normal", "description": "A war boar armored in natural iron plates. Charges through enemies. Found in the Sunken Forge." }
+      ]
+    },
+    "combat": {
+      "style": "soulslike",
+      "damage_types": ["physical_slash", "physical_pierce", "physical_blunt", "fire", "frost", "storm", "holy", "shadow", "blood", "void"],
+      "defense_types": ["plate_armor", "chain_mail", "leather_armor", "cloth_robes", "dragon_scale", "rune_ward"],
+      "weapon_categories": [
+        { "name": "Greatswords", "damage_type": "physical_slash", "range": "melee", "speed": "slow", "description": "Two-handed blades of devastating reach. Wide arcs cleave multiple foes. Heavy commitment on each swing." },
+        { "name": "Straight Swords", "damage_type": "physical_slash", "range": "melee", "speed": "normal", "description": "Balanced one-handed blades. Fast thrusts and slashes. Pair with a shield or off-hand rune." },
+        { "name": "Twinblades", "damage_type": "physical_slash", "range": "melee", "speed": "fast", "description": "Double-ended spinning weapons. Relentless combos but low stagger. Bleed buildup on sustained hits." },
+        { "name": "Warhammers", "damage_type": "physical_blunt", "range": "melee", "speed": "very_slow", "description": "Massive striking weapons. Shatter armor, stagger giants. Devastating charged attacks." },
+        { "name": "Spears", "damage_type": "physical_pierce", "range": "close", "speed": "fast", "description": "Long-reaching thrust weapons. Control distance. Excellent against charging enemies." },
+        { "name": "Longbows", "damage_type": "physical_pierce", "range": "long", "speed": "normal", "description": "Precision ranged weapons. Charged shots pierce armor. Craft specialized arrows for elemental effects." },
+        { "name": "Shortbows", "damage_type": "physical_pierce", "range": "medium", "speed": "fast", "description": "Quick-fire bows for mobile combat. Lower damage but rapid shots. Excellent for applying status arrows." },
+        { "name": "Catalysts", "damage_type": "fire", "range": "medium", "speed": "normal", "description": "Runic staves and orbs that channel elemental magic. Damage type changes with equipped Rune." },
+        { "name": "Chime Shields", "damage_type": "holy", "range": "melee", "speed": "slow", "description": "Enchanted shields that can block and cast. Parry timing triggers a holy burst that staggers attackers." }
+      ],
+      "status_effects": [
+        { "name": "Burning", "element": "fire", "effect": "Fire damage over 6 seconds. Spreads to nearby enemies if they stand in oil. Stacks to 3.", "duration_type": "stacking" },
+        { "name": "Frostbitten", "element": "frost", "effect": "Slows movement by 25%. At 3 stacks, freezes target solid for 2 seconds. Broken by any hit.", "duration_type": "stacking" },
+        { "name": "Shocked", "element": "storm", "effect": "Crackling energy. Next hit chains lightning to 2 nearby enemies. Standing in water while shocked deals bonus damage.", "duration_type": "timed" },
+        { "name": "Bleeding", "element": "blood", "effect": "Physical damage over time. Damage increases as health decreases. Stacks with successive hits.", "duration_type": "stacking" },
+        { "name": "Withered", "element": "shadow", "effect": "Reduces max health by 15% until rested at a bonfire. Healing effectiveness halved.", "duration_type": "permanent_until_rest" },
+        { "name": "Consecrated", "element": "holy", "effect": "Undead and shadow enemies take continuous holy damage. Allies in range regenerate slowly.", "duration_type": "timed" },
+        { "name": "Hollowing", "element": "void", "effect": "Each death increases Hollowing. Higher Hollowing reduces max HP but increases rune find and dark damage.", "duration_type": "stacking" },
+        { "name": "Stagger", "element": "physical", "effect": "Interrupts current action. Build-up based on poise damage taken. Heavy weapons build faster.", "duration_type": "instant" },
+        { "name": "Parried", "element": "physical", "effect": "Riposte window opened. Target is completely vulnerable for a devastating critical hit.", "duration_type": "instant" }
+      ]
+    },
+    "crafting": {
+      "enabled": true,
+      "professions": ["Blacksmithing", "Alchemy", "Runecrafting", "Cooking"],
+      "gathering_skills": ["Mining", "Herbalism", "Bonecarving", "Rune Etching"],
+      "complexity": "deep"
+    },
+    "progression": {
+      "type": "classless_hybrid",
+      "max_level": 101,
+      "skill_trees": [
+        { "name": "Way of the Blade", "description": "Master melee combat. Unlock combo chains, parry techniques, weapon arts, and charged attacks for each weapon type.", "node_count_estimate": 40 },
+        { "name": "Way of the Arrow", "description": "Master ranged combat. Unlock arrow types, aimed shots, rapid fire, and trap placement.", "node_count_estimate": 25 },
+        { "name": "Way of the Rune", "description": "Deepen elemental attunement. Unlock more powerful spells, rune combos, and passive elemental effects.", "node_count_estimate": 50 },
+        { "name": "Way of the Survivor", "description": "Improve health, stamina, equip load, poison resistance, and healing flask potency.", "node_count_estimate": 30 },
+        { "name": "Way of the Wanderer", "description": "Enhance exploration. Faster sprint, reduced fall damage, hidden path detection, and mount bonuses.", "node_count_estimate": 20 }
+      ],
+      "respec_available": true
+    },
+    "economy": {
+      "enabled": true,
+      "currencies": [
+        { "name": "Ember", "type": "primary", "description": "The souls of the fallen, condensed into flickering flame. Dropped by all enemies. Lost on death. Can be recovered at your bloodstain." },
+        { "name": "Remnants", "type": "premium", "description": "Crystallized memories of ancient heroes. Found in hidden tombs. Used for legendary weapon upgrades and unique spells." },
+        { "name": "Covenant Marks", "type": "faction", "description": "Earned by completing tasks for the world's covenants. Trade for covenant-unique gear and spells." }
+      ],
+      "player_trading": false,
+      "auction_house": false,
+      "player_owned_shops": false
+    },
+    "custom_mechanics": [
+      {
+        "name": "Rune Attunement",
+        "description": "Players equip Runes at bonfires that define their abilities. Each Rune channels one element and provides a set of weapon arts and spells. Equipping multiple runes of the same element unlocks Deep Attunement — a devastating ultimate ability.",
+        "rules": [
+          "Players equip up to 3 active Runes and 1 passive Rune at bonfires.",
+          "Each Rune belongs to one of 6 elements: Fire, Frost, Storm, Holy, Shadow, Blood.",
+          "Deep Attunement (2+ same element): Unlocks an ultimate skill for that element.",
+          "Hybrid Attunement (mixed): Access to Rune Resonance combos but no ultimate.",
+          "Runes have tiers: Faded, Writ, Etched, Pristine. Higher tiers unlock more abilities.",
+          "Runes can be upgraded at the Runecrafting table using Rune Fragments."
+        ],
+        "interactions": [
+          "Swapping runes at bonfires is free but resets your respawn point.",
+          "Some dungeon puzzles require specific elemental runes to open sealed doors.",
+          "Boss Warden phases are weak to specific elements — preparation is rewarded.",
+          "Hollowing level affects which runes you can equip — high Hollowing unlocks dark runes but locks holy ones."
+        ]
+      },
+      {
+        "name": "Elemental Resonance",
+        "description": "When two or more elements overlap on a target or terrain, they create a Resonance — a powerful emergent effect that rewards experimentation.",
+        "rules": [
+          "Fire + Frost = Steam Cloud: 4m fog zone that blinds enemies and breaks lock-on.",
+          "Storm + Water (rain/puddles) = Electrified Ground: Standing enemies are stunned.",
+          "Fire + Oil (environmental) = Inferno: Massive fire AoE that persists.",
+          "Holy + Shadow = Annihilation: Burst of void damage that ignores all defenses.",
+          "Blood + Fire = Cauterize: Stops bleeding and heals a small amount.",
+          "Storm + Frost = Thunderfrost: Lightning strikes freeze targets on impact."
+        ],
+        "interactions": [
+          "Weather affects resonance: rain enables Storm+Water combos naturally.",
+          "Some bosses create elemental terrain that enables or prevents certain reactions.",
+          "Environmental traps can be triggered by matching elements (fire arrow + oil trap).",
+          "The final boss fight requires mastering all resonance combos."
+        ]
+      },
+      {
+        "name": "Ember and Death",
+        "description": "A risk-reward death system inspired by soulslike design. Death costs you your Ember (currency) and increases Hollowing, but teaches you enemy patterns.",
+        "rules": [
+          "On death, drop all Ember at your bloodstain. Reach it to recover, or lose it forever on second death.",
+          "Hollowing increases by 1 per death. At thresholds (10, 25, 50), your appearance changes and max HP decreases.",
+          "Higher Hollowing grants bonuses: increased Rune find chance, access to Shadow runes, NPC dialogue changes.",
+          "Bonfires restore health, refill flasks, reset enemies (except bosses), and serve as fast travel points.",
+          "Using a Humanity item at a bonfire reduces Hollowing by 5 and restores your human appearance."
+        ],
+        "interactions": [
+          "Some NPCs only appear at certain Hollowing levels.",
+          "Covenant of the Hollow rewards players who maintain high Hollowing.",
+          "Speedrunners may intentionally Hollow for the damage bonuses.",
+          "The world visually changes at high Hollowing — more shadows, different enemy spawns."
+        ]
+      }
+    ]
+  },
+
+  "world": {
+    "scale": "large",
+    "structure": "open_world",
+    "day_night_cycle": true,
+    "weather_system": ["clear", "overcast", "rain", "thunderstorm", "fog", "ash_fall", "blizzard", "blood_moon"],
+    "time_of_day_effects": true,
+    "environments": [
+      {
+        "name": "The Ember Vale",
+        "type": "plains",
+        "visual_description": "A vast valley of blackened earth and dying ember-grass, where the ground glows faintly orange beneath cracked soil. The skeleton of an ancient cathedral rises from the ash, its spire cracked and weeping embers like slow tears. Twisted trees with coal-black bark stand like sentinels, their leaves replaced by flickering ember motes that drift upward like inverted rain. Color palette: deep amber, charcoal black, burnt orange, ash grey, dying gold.",
+        "audio_mood": "Distant crackling of dying fires, wind whistling through hollow ruins, low groan of settling earth, footsteps crunching on ash-covered ground.",
+        "min_level": 1,
+        "max_level": 20,
+        "sub_areas": [
+          { "name": "Ashfield Crossing", "description": "The starting area. Ruined crossroads with the first bonfire. Tutorial enemies." },
+          { "name": "The Hollow Cathedral", "description": "Massive ruined cathedral. First Rune altar and mini-boss: the Ember Priest." },
+          { "name": "Ember Graveyard", "description": "Undead soldiers rise from ashen graves. Hidden catacombs beneath a mausoleum." },
+          { "name": "The Scorched Bridge", "description": "Stone bridge over a chasm of molten earth. A dragon skeleton wedged in the arches. First Warden." }
+        ],
+        "resources": ["Ashen Iron Ore", "Ember Root Herbs", "Charred Bone", "Faded Rune Shard"],
+        "factions_present": ["Ember Seekers (pilgrims)", "Ashen Hollow (undead)"],
+        "ambiance": { "lighting": "Perpetual amber twilight. Ground glows faintly orange. Bonfires cast warm pools.", "fog": "Thin ash haze. Thicker near ruins.", "particles": "Floating ember motes, ash snowfall, sparks from bonfires.", "sky": "Bruised amber to grey. No visible sun. Blood moon at night." }
+      },
+      {
+        "name": "The Frostbound Peaks",
+        "type": "mountains",
+        "visual_description": "Towering mountains encased in ancient ice that never melts. Frozen waterfalls hang like glass curtains. Wind carves ice into impossible shapes — arches, spires, chambers that sing. At the summit, a fortress of crystallized ice glints like a diamond. Frozen soldiers stand mid-stride, caught in an ancient flash-freeze. Color palette: ice white, pale steel blue, silver, deep navy, glacial turquoise.",
+        "audio_mood": "Howling wind through ice, resonant hum of singing ice, cracking glaciers, distant avalanche rumbles.",
+        "min_level": 20,
+        "max_level": 40,
+        "sub_areas": [
+          { "name": "The Frozen Approach", "description": "Winding paths with ice wolves and frost trolls." },
+          { "name": "Ice Spires Gallery", "description": "Cathedral of natural ice pillars. Prismatic light. Fire rune puzzles." },
+          { "name": "The Frozen Fortress", "description": "Citadel of living ice. Walls reform. Frostbound Warden and Frost Rune altar." },
+          { "name": "Dragon's Rest", "description": "Frozen dragon corpse, miles long, embedded in glacier. Hidden dungeon in its ribcage." }
+        ],
+        "resources": ["Frost Crystal Ore", "Glacier Bloom", "Frozen Dragon Scale", "Writ Rune Shard (Frost)"],
+        "factions_present": ["Frostwardens (ice monks)", "Iceborn Raiders (hostile)"],
+        "ambiance": { "lighting": "Cold blue-white daylight. Prismatic ice refraction. Aurora at night.", "fog": "Blinding blizzards randomly. Clear at peaks.", "particles": "Snow flurries, ice crystals, frozen breath, glittering ice dust.", "sky": "Pale steel blue at day, deep navy at night with aurora." }
+      },
+      {
+        "name": "The Sunken Forge",
+        "type": "industrial",
+        "visual_description": "Colossal underground dwarven city built into a volcanic caldera, now flooded and half-collapsed. Massive iron chains span the cavern over still dark water. Forges are cold but scarred the stone — everything blackened, warped, fused with metal. Ancient dwarven automatons patrol on rusted legs, eyes glowing dim amber. Deeper levels descend to magma chambers where original forges still burn. Color palette: iron black, rust orange, copper green, dark grey, ember red.",
+        "audio_mood": "Constant dripping water, groaning metal, clanking automatons, hissing steam, deep volcanic rumble.",
+        "min_level": 35,
+        "max_level": 55,
+        "sub_areas": [
+          { "name": "The Drowned Quarter", "description": "Upper city flooded to waist. Drowned ghosts. Swimming sections." },
+          { "name": "The Gearworks", "description": "Spinning gears, crushing pistons, conveyor belts. Platforming challenges." },
+          { "name": "The Magma Heart", "description": "Deepest forges still burning. Forge Warden — fire elemental in dwarven steel. Fire Rune altar." },
+          { "name": "The Armory Vault", "description": "Sealed vault with legendary weapons. Best smithing station." }
+        ],
+        "resources": ["Dwarven Steel Ore", "Magma Crystal", "Runic Copper", "Etched Rune Shard (Fire)"],
+        "factions_present": ["Iron Covenant (dwarven remnants)", "Steam Cultists (mad engineers)"],
+        "ambiance": { "lighting": "Dim amber from heat. Lava glow at depth. Automaton eyes as moving lights.", "fog": "Steam in lower levels. Water mist above. Near-zero visibility in steam tunnels.", "particles": "Falling water, steam plumes, sparks, floating rust.", "sky": "No sky. Cavern ceiling with stalactites." }
+      },
+      {
+        "name": "The Verdant Tomb",
+        "type": "jungle",
+        "visual_description": "An ancient forest that consumed an entire civilization. Massive temples split apart by building-sized tree roots. Canopy so thick the floor exists in permanent twilight, lit by bioluminescent fungi and corrupted nature spirits. Trees shift when you're not looking. Giant insects patrol the canopy. Deeper in, corruption shows: twisted pulsing roots, screaming flowers, animals with too many eyes. Color palette: deep emerald, bioluminescent cyan, stone grey, corruption purple, shadow black.",
+        "audio_mood": "Layered insect chorus, distant animal calls, creaking massive trees, bubbling streams, unsettling whispers of leaves.",
+        "min_level": 50,
+        "max_level": 70,
+        "sub_areas": [
+          { "name": "The Outer Canopy", "description": "Forest edge. Giant trees, rope bridges. Druid NPCs. Relatively safe." },
+          { "name": "The Temple District", "description": "Ruined temples overtaken by nature. Each is a puzzle dungeon. Ancient murals tell history." },
+          { "name": "The Corruption Heart", "description": "Center of corruption. Trees walk. Air is toxic. Nature Warden guards Shadow Rune altar." },
+          { "name": "The Root Depths", "description": "Underground beneath roots. Bioluminescent fungi. Ancient burial chambers." }
+        ],
+        "resources": ["Living Wood", "Bioluminescent Spore", "Ancient Stone Fragment", "Pristine Rune Shard (Shadow)"],
+        "factions_present": ["Verdant Circle (druids)", "The Rootbound (corrupted)", "Tomb Scholars"],
+        "ambiance": { "lighting": "Perpetual twilight. Bioluminescent glow. Occasional green-tinted sunlight.", "fog": "Ground fog. Pollen haze. Toxic purple fog in corrupted zones.", "particles": "Pollen, falling leaves, bioluminescent spores, firefly swarms.", "sky": "Almost never visible — dense canopy." }
+      },
+      {
+        "name": "The Pale Reach",
+        "type": "ethereal",
+        "visual_description": "A vast featureless white plain stretching to infinity. No horizon — ground and sky merge into white void. Impossible geometries: looping staircases, doors opening onto the same room, towers taller inside than outside. Time and space are unreliable. Remnant Monoliths — massive black stones humming with void energy — contain memories of the world before the Sundering. At the center, the Ember Crown sits on a throne of nothing. Color palette: bone white, void black, ghost grey, impossible color flashes.",
+        "audio_mood": "Oppressive silence broken by distant echoes of ancient battles, monolith hum, your heartbeat, whispers that might be wind or voices.",
+        "min_level": 75,
+        "max_level": 101,
+        "sub_areas": [
+          { "name": "The Threshold", "description": "Entry point. First impossible geometry — a bridge that exists only when not looked at." },
+          { "name": "Memory Halls", "description": "Dungeons inside Monoliths. Fully realized scenes from the past you can walk through." },
+          { "name": "The Impossible City", "description": "Looping architecture. Final merchants trade in memories instead of Ember." },
+          { "name": "The Throne of Nothing", "description": "Center of everything. The Ember Crown on its throne. Final Warden — Vorthak the Unraveled." }
+        ],
+        "resources": ["Void Crystal", "Memory Fragment", "Pristine Rune Shard (Void)", "Crown Fragment"],
+        "factions_present": ["The Remnant (ghosts seeking release)", "Crown Seekers (want the Crown's power)"],
+        "ambiance": { "lighting": "Diffused white light, no source. Shadows point in impossible directions.", "fog": "White void limiting visibility to 50m. Clears near Monoliths.", "particles": "Static-like particles, ghost afterimages, reality distortion ripples.", "sky": "No sky — white void above merges with ground." }
+      }
+    ],
+    "dungeons": [
+      {
+        "name": "The Hollow Cathedral",
+        "difficulty": "normal",
+        "player_count": { "min": 1, "max": 1 },
+        "visual_description": "A ruined cathedral of blackened stone. Pews overturned, altar cracked, stained glass shattered into colored shards on the floor. The deeper crypts are a maze of burial chambers where the dead have risen. The air smells of old incense and ash.",
+        "floors": 3,
+        "boss_encounters": [
+          { "name": "The Ember Priest", "description": "A hollowed cleric still performing last rites to a dead god. Throws fireballs and summons ember ghosts.", "mechanics": ["Throws fireballs in 3-round bursts", "Summons 2 ember ghosts every 30 seconds", "Channel heal — must be interrupted with damage", "At 50% enrages, fire attacks leave burning ground"], "phases": 2 }
+        ],
+        "traps": ["Collapsing floor sections", "Fire jets from wall gargoyles", "Ember ghost ambushes"],
+        "puzzles": ["Reorder shattered stained glass to reveal hidden passage", "Light 4 altar candles in correct elemental order"],
+        "loot_tier": "uncommon",
+        "elemental_affinity": ["fire", "holy"]
+      },
+      {
+        "name": "The Frozen Fortress",
+        "difficulty": "hard",
+        "player_count": { "min": 1, "max": 1 },
+        "visual_description": "A citadel of living ice where walls reform when damaged. Every surface is mirror-smooth ice. Enemies are visible through the walls — distorted, ghostly shapes moving through frozen corridors. The central chamber is a vast frozen lake with the Warden standing on the surface.",
+        "floors": 4,
+        "boss_encounters": [
+          { "name": "The Frostbound Warden", "description": "A knight encased in eternal ice. Moves with surprising speed. Creates ice clones of the player.", "mechanics": ["Ice slide — dashes across the frozen floor leaving frost trails", "Creates 2 ice clones that mirror player attacks", "Breath attack creates expanding frost zone", "At 30% the floor shatters — fight in water with ice platforms"], "phases": 3 }
+        ],
+        "traps": ["Ice spike floor traps triggered by weight", "Freezing mist corridors", "Mirror-maze with real/fake walls"],
+        "puzzles": ["Melt ice walls with fire runes in sequence", "Reflect light beams off ice surfaces to open gates"],
+        "loot_tier": "rare",
+        "elemental_affinity": ["frost"]
+      },
+      {
+        "name": "The Magma Heart",
+        "difficulty": "very_hard",
+        "player_count": { "min": 1, "max": 1 },
+        "visual_description": "The deepest dwarven forges, still burning. Rivers of lava flow through carved channels. The heat distorts the air. Massive hammers still swing automatically, powered by geothermal pressure. The arena is a circular platform over a lava lake.",
+        "floors": 5,
+        "boss_encounters": [
+          { "name": "The Forge Warden", "description": "A fire elemental bound in dwarven mechanical armor. A walking forge. Its attacks create lava geysers.", "mechanics": ["Hammer slam creates expanding lava fissures", "Summons fire automatons from the forge walls", "Forge phase — becomes invulnerable, must destroy the anvil", "At 25% the arena floods — fight on shrinking platforms over lava", "Vulnerable to frost — frost runes deal 3x damage"], "phases": 4 }
+        ],
+        "traps": ["Lava geysers on timers", "Spinning gear crushers", "Heat vents dealing DoT", "Pressurized steam blasts"],
+        "puzzles": ["Reroute lava flows to cool pathways", "Activate forge mechanisms in sequence", "Cool heated doors with frost runes"],
+        "loot_tier": "epic",
+        "time_limit_minutes": 30,
+        "elemental_affinity": ["fire", "storm"]
+      },
+      {
+        "name": "The Corruption Heart",
+        "difficulty": "extreme",
+        "player_count": { "min": 1, "max": 1 },
+        "visual_description": "The center of the Verdant Tomb where the Ember Shard has twisted all life. Trees walk. Flowers scream when touched. The ground is a pulsing network of dark roots. The air is thick purple fog that damages you over time. The arena is the hollowed trunk of the world's largest tree.",
+        "floors": 1,
+        "boss_encounters": [
+          { "name": "The Nature Warden", "description": "A colossal tree spirit — part ancient guardian, part corrupted horror. Its body is wood and shadow, with a face of screaming faces of those it consumed.", "mechanics": ["Root slam — roots erupt from ground in patterns", "Spore cloud — toxic fog that persists, must find clean air pockets", "Tree shift — the arena changes shape, closing/opening paths", "Consumes adds to heal — must kill minions before it reaches them", "At 20% merges with the corruption — entire arena becomes hostile"], "phases": 4 }
+        ],
+        "traps": ["Toxic spore clouds", "Carnivorous plants", "Root snares that hold you in place", "Corruption pools that apply Withered"],
+        "puzzles": ["Purify corruption nodes in sequence while being attacked", "Guide light through the canopy to weaken the Warden"],
+        "loot_tier": "legendary",
+        "time_limit_minutes": 45,
+        "elemental_affinity": ["shadow", "blood"]
+      },
+      {
+        "name": "The Throne of Nothing",
+        "difficulty": "raid",
+        "player_count": { "min": 1, "max": 1 },
+        "visual_description": "The center of the Pale Reach. A throne of absolute nothingness — a hole in reality shaped like a seat. The Ember Crown floats above it, radiating impossible colors. The arena has no floor — you stand on nothing. The rules of physics break down: gravity shifts, time loops, space folds. The final Warden exists partially outside reality.",
+        "floors": 1,
+        "boss_encounters": [
+          { "name": "Vorthak the Unraveled", "description": "The final Warden. A being that exists in multiple states simultaneously. Part man, part void, part memory of what the world was before.", "mechanics": ["Reality phases — alternates between material and void plane every 60s", "Unraveling — randomly deletes one ability for 20 seconds", "Memory erasure — UI disappears for 10 seconds, rely on audio cues", "Gravity inversion every 45 seconds", "At 10% all phases combine — chaotic final stand", "Defeating Vorthak gives the player a choice: restore the Crown or destroy it"], "phases": 5 }
+        ],
+        "traps": ["Reality tears teleporting to danger zones", "Time loops that repeat the last 5 seconds", "Void pockets silencing all abilities"],
+        "puzzles": ["Navigate non-euclidean corridors using Monolith compass", "Phase between material and void to cross gaps"],
+        "loot_tier": "mythic",
+        "time_limit_minutes": 60,
+        "elemental_affinity": ["void"]
+      }
+    ],
+    "procedural_generation": {
+      "enabled": true,
+      "scope": ["dungeons", "loot", "events"],
+      "seed_based": true,
+      "description": "Chalice Dungeons — procedurally generated underground labyrinths accessible from any bonfire. Randomized layouts, enemy placement, and elemental affixes. Deeper floors have better loot but harder enemies. Seeded runs for sharing."
+    }
+  },
+
+  "entities": {
+    "player": {
+      "visual_description": "A weathered adventurer clad in scavenged armor. Face bears the marks of Hollowing — veins of dark energy that pulse when near death. Equipment visually changes appearance. Equipped Runes glow faintly on gauntlets and weapon.",
+      "customization": { "body_types": ["lean", "athletic", "heavy"], "facial_features": true, "hair_styles": 30, "skin_colors": 15, "equipment_visibility": true },
+      "stats": ["health", "stamina", "strength", "dexterity", "intellect", "resilience", "luck", "hollowing"],
+      "abilities": [
+        { "name": "Ember Strike", "description": "Basic melee attack. Damage type matches equipped weapon.", "cooldown_seconds": 0, "resource_cost": "stamina" },
+        { "name": "Rune Art", "description": "Weapon art powered by equipped Rune. Unique per rune element.", "cooldown_seconds": 15, "resource_cost": "25% mana" },
+        { "name": "Flask of Healing", "description": "Drink from your flask to restore health. Refilled at bonfires.", "cooldown_seconds": 3, "resource_cost": "1 flask charge" },
+        { "name": "Parry", "description": "If timed correctly, opens a riposte window. Shield or weapon dependent.", "cooldown_seconds": 0, "resource_cost": "stamina" }
+      ]
+    },
+    "enemies": [
+      { "name": "Ashen Hollow", "type": "normal", "description": "Hollowed humans shambling through the Ember Vale. Slow but attack in groups.", "element": "fire", "level_range": { "min": 1, "max": 10 }, "abilities": ["Swipe", "Grab", "Ember Burst"], "weaknesses": ["holy"], "resistances": ["fire"], "behavior": "pack" },
+      { "name": "Frost Wolf", "type": "normal", "description": "Massive white wolves with ice-crusted fur. Fast and coordinated. Hunt in packs of 3-5.", "element": "frost", "level_range": { "min": 20, "max": 30 }, "abilities": ["Pounce", "Frost Bite", "Pack Howl"], "weaknesses": ["fire"], "resistances": ["frost"], "behavior": "pack" },
+      { "name": "Dwarven Automaton", "type": "elite", "description": "Rusted mechanical dwarves still following ancient patrol routes. Strong but predictable patterns.", "element": "storm", "level_range": { "min": 38, "max": 50 }, "abilities": ["Hammer Slam", "Steam Blast", "Gear Spin"], "weaknesses": ["storm", "fire"], "resistances": ["physical_blunt", "frost"], "behavior": "patrol" },
+      { "name": "Corrupted Treant", "type": "elite", "description": "Once-ancient guardian trees twisted by shadow corruption. Massive, slow, devastating.", "element": "shadow", "level_range": { "min": 52, "max": 65 }, "abilities": ["Root Slam", "Corruption Spit", "Branch Sweep", "Spore Cloud"], "weaknesses": ["fire", "holy"], "resistances": ["shadow", "physical"], "behavior": "territorial" },
+      { "name": "Void Wraith", "type": "elite", "description": "A ghost that phases between reality and void. Appears and disappears unpredictably.", "element": "void", "level_range": { "min": 78, "max": 95 }, "abilities": ["Phase Shift", "Void Drain", "Reality Tear"], "weaknesses": ["holy", "storm"], "resistances": ["shadow", "void", "physical"], "behavior": "ambush" },
+      { "name": "The Ember Priest", "type": "mini_boss", "description": "A hollowed cleric still performing last rites. Throws fireballs and summons ember ghosts.", "element": "fire", "level_range": { "min": 10, "max": 10 }, "abilities": ["Fireball Burst", "Ghost Summon", "Channel Heal", "Enraged Flames"], "weaknesses": ["frost", "storm"], "resistances": ["fire", "holy"], "behavior": "aggressive" },
+      { "name": "The Frostbound Warden", "type": "boss", "description": "A knight encased in eternal ice. Creates ice clones of the player. Devastating frost combos.", "element": "frost", "level_range": { "min": 40, "max": 40 }, "abilities": ["Ice Slide", "Clone Mirror", "Frost Breath", "Floor Shatter"], "weaknesses": ["fire"], "resistances": ["frost", "physical"], "behavior": "aggressive" },
+      { "name": "Vorthak the Unraveled", "type": "raid_boss", "description": "The final Warden. Exists in multiple states simultaneously. Part man, part void, part memory.", "element": "void", "level_range": { "min": 101, "max": 101 }, "abilities": ["Reality Phase", "Unravel", "Memory Erasure", "Gravity Inversion", "Existence Collapse"], "weaknesses": ["holy", "fire"], "resistances": ["void", "shadow", "physical"], "behavior": "aggressive" }
+    ],
+    "items": {
+      "rarity_tiers": [
+        { "name": "Common", "color_hex": "#9d9d9d", "drop_rate_weight": 100 },
+        { "name": "Uncommon", "color_hex": "#1eff00", "drop_rate_weight": 40 },
+        { "name": "Rare", "color_hex": "#0070dd", "drop_rate_weight": 12 },
+        { "name": "Epic", "color_hex": "#a335ee", "drop_rate_weight": 4 },
+        { "name": "Legendary", "color_hex": "#ff8000", "drop_rate_weight": 1 },
+        { "name": "Mythic", "color_hex": "#e6cc80", "drop_rate_weight": 0.1 }
+      ],
+      "equipment_slots": ["head", "chest", "hands", "legs", "feet", "main_hand", "off_hand", "ring1", "ring2", "amulet", "rune_slot_1", "rune_slot_2", "rune_slot_3", "passive_rune"],
+      "categories": [
+        { "name": "Weapons", "description": "All weapon types from greatswords to catalysts.", "examples": ["Ember Greatsword", "Frostbite Twinblade", "Stormcaller Bow", "Shadow Catalyst"] },
+        { "name": "Armor", "description": "Protective gear with elemental resistances.", "examples": ["Dragon Scale Chest", "Frostwarden Plate", "Shadowweave Robes", "Ironbark Shield"] },
+        { "name": "Runes", "description": "Elemental runes that define your abilities.", "examples": ["Rune of Inferno", "Rune of Frostbite", "Rune of the Tempest", "Rune of Annihilation"] },
+        { "name": "Consumables", "description": "Healing, buff, and utility items.", "examples": ["Ember Flask", "Humanity", "Firebomb", "Throwing Knives"] },
+        { "name": "Key Items", "description": "Progression items and quest objects.", "examples": ["Crown Shard", "Warden Key", "Memory Fragment", "Monolith Compass"] }
+      ],
+      "enchanting_system": { "enabled": true, "description": "Infuse weapons with elemental properties at the Runecrafting table. Infusions add visual effects and scale with your Rune Attunement. Higher tiers risk destroying the weapon." }
+    }
+  },
+
+  "assets": {
+    "models_3d": [
+      { "name": "The Ember Crown", "description": "A broken crown of dark metal with seven empty sockets. Faint ember glow from within. Cracked and ancient, radiating divine heat.", "tags": ["item", "hero_prop", "legendary"], "variants": 1 },
+      { "name": "Dwarven Automaton", "description": "A humanoid mechanical figure of riveted iron plates, standing 8 feet tall. Rust covers most surfaces. Eyes glow dim amber. Joints steam when moving.", "tags": ["enemy", "mechanical"], "variants": 3 },
+      { "name": "Frozen Dragon Corpse", "description": "A dragon skeleton miles long, encased in glacial ice. Visible through the translucent ice — bones, teeth, and a still-beating heart glowing faintly.", "tags": ["environment", "hero_prop"], "variants": 1 },
+      { "name": "Monolith", "description": "A 30-foot black stone obelisk inscribed with impossible geometries. Surface seems to absorb light. Void energy crackles along its edges.", "tags": ["environment", "void"], "variants": 2 }
+    ],
+    "textures": [
+      { "name": "Ashen Iron", "description": "Blackened iron with orange-red ember cracks visible through the surface. Heat-distortion effect at edges.", "tags": ["armor", "fire"] },
+      { "name": "Frostbitten Steel", "description": "Silver metal with frost crystal formations growing from it. Pale blue-white with condensation frost.", "tags": ["weapon", "frost"] },
+      { "name": "Living Wood", "description": "Bark texture with visible veins of green energy pulsing beneath. Slightly moves/breathes.", "tags": ["environment", "nature"] },
+      { "name": "Void Corruption", "description": "Healthy material breaking down into static-like void energy. Reality distortion at edges.", "tags": ["environment", "void"] }
+    ],
+    "animations": [
+      { "name": "Ember Strike", "description": "Weapon swings with ember trail. Impact creates sparks. Follow-through has slight screen shake.", "tags": ["combat", "melee"] },
+      { "name": "Rune Activation", "description": "Hands glow with elemental color. Rune symbols orbit wrists. Energy builds then releases.", "tags": ["ability", "magic"] },
+      { "name": "Parry Riposte", "description": "Shield deflects with spark burst. Time slows for 0.5s. Counter-thrust with critical glow.", "tags": ["combat", "parry"] },
+      { "name": "Hollowing Shift", "description": "Character's veins pulse with dark energy. Appearance subtly changes — more gaunt, darker eyes.", "tags": ["status", "hollowing"] }
+    ],
+    "audio": {
+      "music": [
+        { "name": "Ember Vale — Exploration", "mood": "melancholic, desolate, haunting", "description": "Solo cello over distant ambient drones. Occasional dissonant strings. 60 BPM. Weight of a dead world.", "loop": true, "environment": "The Ember Vale" },
+        { "name": "Frostbound Peaks — Summit", "mood": "cold, vast, awe-inspiring", "description": "Crystalline bells over howling wind ambience. Choir enters at crescendo. 80 BPM.", "loop": true, "environment": "The Frostbound Peaks" },
+        { "name": "Boss Battle — Warden", "mood": "intense, desperate, epic", "description": "Full orchestral assault. War drums, brass stabs, choir. Dynamic layers that intensify with boss phases.", "loop": true },
+        { "name": "The Pale Reach", "mood": "unsettling, alien, oppressive", "description": "Reverse piano, detuned strings, whispered vocals. No discernible rhythm. Wrongness.", "loop": true, "environment": "The Pale Reach" }
+      ],
+      "sfx": [
+        { "name": "Bonfire Rest", "description": "Deep bass warmth, crackling fire, a sigh of relief, subtle harmonic chord that resolves tension.", "trigger": "Resting at a bonfire" },
+        { "name": "Death", "description": "Muffled impact, slow heartbeat fading, silence, then the sound of embers scattering.", "trigger": "Player death" },
+        { "name": "Ember Pickup", "description": "Soft chime with warm undertone. Like collecting starlight.", "trigger": "Collecting Ember from defeated enemy" },
+        { "name": "Parry", "description": "Sharp metallic clang with high-pitched ring. Time seems to stop for a beat.", "trigger": "Successful parry" }
+      ],
+      "ambient": [
+        { "name": "Ember Vale Night", "description": "Distant crackling, wind through hollow ruins, occasional groan of settling earth, ash falling.", "environment": "The Ember Vale" },
+        { "name": "Frostbound Wind", "description": "Constant howling wind, ice singing at different pitches, distant avalanche rumble.", "environment": "The Frostbound Peaks" }
+      ],
+      "voice": [
+        { "character": "The Last Keeper (Bonfire NPC)", "voice_description": "Old, weary, kind. Female voice with warmth beneath exhaustion. Speaks slowly, choosing words carefully.", "sample_lines": ["Rest here, Emberborn. The road ahead is long.", "The Crown remembers those who carried it. It does not forgive."] },
+        { "character": "Vorthak the Unraveled (Final Boss)", "voice_description": "Multiple voices layered slightly out of sync. Whisper and boom simultaneously. Male, female, neither.", "sample_lines": ["You are a memory trying to remember itself.", "The Crown was never meant to be whole. It was meant to be forgotten."] }
+      ]
+    },
+    "vfx": [
+      { "name": "Ember Trail", "description": "Fading orange particles trailing behind weapon swings and character movement.", "tags": ["combat", "fire"] },
+      { "name": "Rune Resonance", "description": "Two elemental colors collide and spiral into a bright burst. Screen flash. Impact shockwave.", "tags": ["combo", "elemental"] },
+      { "name": "Hollowing Aura", "description": "Dark energy wisps rising from character. Intensity scales with Hollowing level.", "tags": ["status", "void"] },
+      { "name": "Mythic Drop", "description": "Item on ground pulses with golden-orange light. Beam of light shoots upward. Distant choir.", "tags": ["loot", "legendary"] }
+    ]
+  },
+
+  "logic": {
+    "quests": [
+      { "name": "The First Ember", "type": "main_story", "description": "Awaken at the Ashfield Crossing with no memory. Find the first bonfire. Defeat the Ashen Hollows blocking the path. Receive your first Rune.", "level_requirement": 1, "steps": [
+        { "order": 1, "description": "Find the bonfire at the ruined crossroads.", "objective_type": "discover" },
+        { "order": 2, "description": "Defeat the Ashen Hollows on the old road.", "objective_type": "kill" },
+        { "order": 3, "description": "Meet the Last Keeper at the bonfire.", "objective_type": "talk_to" },
+        { "order": 4, "description": "Receive the Faded Rune of Fire.", "objective_type": "discover" }
+      ], "rewards": { "xp": 500, "items": ["Faded Rune of Fire", "Ember Flask"], "unlock": "Rune Attunement System" }, "branching": false },
+      { "name": "The Frozen Warden", "type": "main_story", "description": "Seek the second Crown Shard in the Frostbound Peaks. Confront the Frostbound Warden.", "level_requirement": 25, "prerequisites": ["The First Ember"], "steps": [
+        { "order": 1, "description": "Ascend the Frozen Approach.", "objective_type": "explore" },
+        { "order": 2, "description": "Solve the Ice Spires light puzzles.", "objective_type": "solve_puzzle" },
+        { "order": 3, "description": "Enter the Frozen Fortress.", "objective_type": "explore" },
+        { "order": 4, "description": "Defeat the Frostbound Warden.", "objective_type": "kill" },
+        { "order": 5, "description": "Claim the second Crown Shard.", "objective_type": "collect" }
+      ], "rewards": { "xp": 15000, "items": ["Crown Shard (Frost)", "Writ Rune of Frost"], "unlock": "Frostbound Peaks fully accessible" } },
+      { "name": "The Choice of Crowns", "type": "main_story", "description": "The final quest. Confront Vorthak and decide the fate of the Ember Crown — and the world.", "level_requirement": 95, "prerequisites": ["The Frozen Warden"], "steps": [
+        { "order": 1, "description": "Collect all 5 remaining Crown Shards.", "objective_type": "collect" },
+        { "order": 2, "description": "Enter the Pale Reach.", "objective_type": "explore" },
+        { "order": 3, "description": "Navigate the Memory Halls.", "objective_type": "explore" },
+        { "order": 4, "description": "Defeat Vorthak the Unraveled.", "objective_type": "kill" },
+        { "order": 5, "description": "Choose: Restore the Crown or Destroy it.", "objective_type": "solve_puzzle" }
+      ], "rewards": { "xp": 100000, "items": ["The Ember Crown (restored) or Memory of the Crown (destroyed)"], "unlock": "Ending cinematic and New Game+" }, "branching": true },
+      { "name": "The Last Dragon", "type": "side_quest", "description": "Find the dragon heart in Dragon's Rest. Decide whether to revive the dragon or harvest its power.", "level_requirement": 35, "steps": [
+        { "order": 1, "description": "Discover Dragon's Rest in the Frostbound Peaks.", "objective_type": "explore" },
+        { "order": 2, "description": "Navigate the ribcage dungeon.", "objective_type": "explore" },
+        { "order": 3, "description": "Find the still-beating heart.", "objective_type": "discover" },
+        { "order": 4, "description": "Choose: Revive or Harvest.", "objective_type": "solve_puzzle" }
+      ], "rewards": { "xp": 8000, "unlock": "Dragon Mount or Dragonfire Rune" }, "branching": true }
+    ],
+    "world_events": [
+      { "name": "Blood Moon", "type": "scheduled", "description": "Every 7 in-game days, a blood moon rises. All enemies are stronger, drop more Ember, and unique Blood Moon variants appear.", "rewards": ["Double Ember drops", "Blood Moon exclusive items"] },
+      { "name": "Warden's Echo", "type": "random", "description": "A ghostly echo of a previously defeated Warden appears in a random zone. Defeating it grants bonus Remnants.", "rewards": ["Remnants", "Rare Rune Fragments"] },
+      { "name": "The Shifting Maze", "type": "triggered", "description": "Using a Monolith Compass near a Monolith opens a portal to a shifting maze. Completing it grants a Pristine Rune Shard.", "rewards": ["Pristine Rune Shard", "Memory Fragment"] }
+    ],
+    "crafting_recipes": [
+      { "name": "Ember Greatsword", "profession": "Blacksmithing", "skill_level_required": 250, "ingredients": [{ "item": "Ashen Iron Ore", "quantity": 15 }, { "item": "Ember Root", "quantity": 5 }, { "item": "Faded Rune Shard", "quantity": 2 }], "result": "Ember Greatsword (Rare)", "result_quantity": 1 },
+      { "name": "Flask of Greater Healing", "profession": "Alchemy", "skill_level_required": 100, "ingredients": [{ "item": "Ember Root Herbs", "quantity": 3 }, { "item": "Glacier Bloom", "quantity": 1 }], "result": "Flask of Greater Healing", "result_quantity": 2 },
+      { "name": "Rune of the Tempest", "profession": "Runecrafting", "skill_level_required": 350, "ingredients": [{ "item": "Writ Rune Shard (Storm)", "quantity": 3 }, { "item": "Void Crystal", "quantity": 1 }, { "item": "Frozen Dragon Scale", "quantity": 1 }], "result": "Etched Rune of Storm", "result_quantity": 1 }
+    ]
+  },
+
+  "ui": {
+    "style": "Dark minimalist with ember accents. Thin borders, clean fonts. HUD elements are semi-transparent dark panels with faint ember glow on important indicators. Minimal screen clutter — only essential info visible during combat.",
+    "color_palette": { "primary": "#1a1410", "secondary": "#2d2520", "accent": "#ff6b2b", "background": "#0d0a08", "text": "#e8dcc8" },
+    "hud_elements": [
+      { "name": "Health Bar", "position": "bottom_left", "description": "Thin horizontal bar. Deep red. Pulses when low. Flask charges shown as small circles below." },
+      { "name": "Stamina Bar", "position": "bottom_left", "description": "Thin bar below health. Yellow-green. Depletes on sprint, attack, dodge." },
+      { "name": "Mana Indicator", "position": "bottom_left", "description": "Small blue orb next to stamina. Glows brighter when full." },
+      { "name": "Rune Display", "position": "bottom_right", "description": "3 small rune icons showing equipped runes. Active rune glows. Matches element color." },
+      { "name": "Enemy Health", "position": "top_center", "description": "Appears on targeting. Name, health bar, and elemental affinity icon." },
+      { "name": "Ember Count", "position": "bottom_right", "description": "Small ember icon with count. Pulses when Ember is gained." }
+    ],
+    "menus": [
+      { "name": "Equipment", "type": "inventory", "description": "Grid inventory with equipment slots. Character preview with current gear. Rune loadout section." },
+      { "name": "Rune Codex", "type": "lore_book", "description": "Collection of discovered runes. Shows element, abilities, resonance combos, and upgrade paths." },
+      { "name": "World Map", "type": "map", "description": "Hand-drawn map that fills as you explore. Bonfires shown as ember icons. Discovered areas in color, undiscovered in sketch." },
+      { "name": "Bestiary", "type": "lore_book", "description": "Encyclopedia of defeated enemies. Lore, weakness info, kill count, and drops." },
+      { "name": "Settings", "type": "settings", "description": "Graphics, audio, controls. Includes difficulty modifiers and accessibility options." }
+    ],
+    "accessibility": {
+      "colorblind_modes": ["protanopia", "deuteranopia", "tritanopia"],
+      "subtitle_support": true,
+      "remappable_controls": true,
+      "screen_reader_support": false,
+      "font_scaling": true
+    }
+  }
+}
