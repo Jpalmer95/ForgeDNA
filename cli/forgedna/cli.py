@@ -43,11 +43,13 @@ def init_cmd(
 def remix(
     file: str = typer.Argument(help="Path to existing game DNA file to remix."),
     output: str = typer.Option(None, "--output", "-o", help="Output file path"),
+    author: str = typer.Option("anonymous", "--author", "-a", help="Who is remixing (name or agent ID)"),
+    changes: str = typer.Option("", "--changes", "-c", help="Summary of what changed"),
 ):
     """Fork an existing DNA file with remix metadata."""
     from forgedna.remix import remix_file
 
-    remix_file(file, output)
+    remix_file(file, output, author=author, changes=changes)
 
 
 @app.command()
@@ -85,6 +87,17 @@ def list_templates():
         table.add_row(name, info["description"], f"{name}.json")
 
     console.print(table)
+
+
+@app.command()
+def lineage(
+    file: str = typer.Argument(help="Path to game DNA file."),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show full details."),
+):
+    """Show the ancestry tree of a DNA file."""
+    from forgedna.lineage import show_lineage
+
+    show_lineage(file, verbose=verbose)
 
 
 @app.command()
