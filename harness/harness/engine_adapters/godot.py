@@ -4,16 +4,36 @@ from pathlib import Path
 from typing import Any
 
 from ..dna_parser import GameDNA
+from .base import EngineAdapter
 
 
-class GodotAdapter:
+class GodotAdapter(EngineAdapter):
     """Generates a complete Godot 4.x project from GameDNA."""
 
     def __init__(self, dna: GameDNA, output_dir: str):
-        self.dna = dna
-        self.output_dir = Path(output_dir)
+        super().__init__(dna, output_dir)
         self.project_dir = self.output_dir / "godot_project"
         self.project_dir.mkdir(parents=True, exist_ok=True)
+
+    def get_engine_name(self) -> str:
+        return "godot"
+
+    def get_engine_version(self) -> str:
+        return "4.x"
+
+    def get_supported_features(self) -> list[str]:
+        return [
+            "movement", "combat", "crafting", "progression", "economy",
+            "day_night", "weather", "quests", "npcs", "enemies",
+            "items", "inventory", "dialogue", "skill_trees", "save_system",
+        ]
+
+    def get_export_targets(self) -> list[str]:
+        return ["pc", "mac", "linux", "web", "android"]
+
+    def generate_project(self, outputs: dict[str, Any] | None = None) -> dict[str, Any]:
+        """Assemble all outputs into a complete Godot project."""
+        return self.generate_all()
 
     def generate_all(self) -> dict[str, Any]:
         """Generate the complete Godot project."""

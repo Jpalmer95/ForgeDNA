@@ -118,6 +118,79 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Games or media that inspire this project."
+        },
+        "author": {
+          "type": "string",
+          "description": "Creator identity (human name, agent ID, or org)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 creation timestamp."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 last-modified timestamp."
+        },
+        "license": {
+          "type": "string",
+          "enum": ["cc0", "cc-by", "cc-by-sa", "cc-by-nc", "cc-by-nc-sa", "mit", "apache-2.0", "gpl-3.0", "all-rights-reserved"],
+          "description": "License for this DNA. Default: cc-by-sa."
+        },
+        "lineage": {
+          "$ref": "#/definitions/Lineage"
+        }
+      }
+    },
+
+    "Lineage": {
+      "type": "object",
+      "description": "Remix ancestry tracking. Auto-populated by forgedna remix.",
+      "additionalProperties": false,
+      "properties": {
+        "dna_id": {
+          "type": "string",
+          "description": "Unique UUID for this DNA instance."
+        },
+        "original_id": {
+          "type": "string",
+          "description": "UUID of the very first DNA in the chain (self if original)."
+        },
+        "parent_id": {
+          "type": "string",
+          "description": "UUID of the DNA this was remixed from (null if original)."
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Remix depth. 0 = original, 1 = first remix, 2 = remix of remix, etc."
+        },
+        "remixed_by": {
+          "type": "string",
+          "description": "Who performed this remix (human name or agent ID)."
+        },
+        "remixed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this remix was created."
+        },
+        "changes_summary": {
+          "type": "string",
+          "description": "Human/agent-readable summary of what changed in this remix."
+        },
+        "ancestors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dna_id": { "type": "string" },
+              "title": { "type": "string" },
+              "author": { "type": "string" },
+              "generation": { "type": "integer" }
+            }
+          },
+          "description": "Full ancestry chain for quick traversal."
         }
       }
     },
