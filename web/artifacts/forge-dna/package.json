@@ -41,6 +41,7 @@
     "@tanstack/react-query": "catalog:",
     "@workspace/api-client-react": "workspace:*",
     "@workspace/game-dna-schema": "workspace:*",
+    "@workspace/replit-auth-web": "workspace:*",
     "class-variance-authority": "catalog:",
     "clsx": "catalog:",
     "cmdk": "^1.1.1",
