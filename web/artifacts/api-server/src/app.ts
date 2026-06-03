@@ -16,7 +16,7 @@ app.use(authMiddleware);
 app.use("/api", router);
 
 // Serve the built frontend
-const publicDir = path.resolve(import.meta.dirname, "..", "public");
+const publicDir = path.resolve(__dirname, "..", "public");
 app.use(express.static(publicDir));
 
 // SPA fallback — serve index.html for all non-API routes
