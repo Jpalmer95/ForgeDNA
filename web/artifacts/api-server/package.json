@@ -1,0 +1,33 @@
+{
+  "name": "@workspace/api-server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "NODE_ENV=development tsx ./src/index.ts",
+    "build": "tsx ./build.ts",
+    "start": "node dist/index.cjs",
+    "db:push": "cd ../../lib/db && pnpm run push",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@workspace/api-zod": "workspace:*",
+    "@workspace/db": "workspace:*",
+    "@workspace/game-dna-schema": "workspace:*",
+    "openai": "^4.77.0",
+    "openid-client": "^6.8.2",
+    "archiver": "^7.0.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2",
+    "express": "^5"
+  },
+  "devDependencies": {
+    "@types/archiver": "^7.0.0",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "catalog:",
+    "esbuild": "^0.27.3",
+    "tsx": "catalog:"
+  }
+}

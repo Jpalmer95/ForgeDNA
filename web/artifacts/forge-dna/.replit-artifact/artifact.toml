@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "ForgeDNA"
+version = "1.0.0"
+id = "artifacts/forge-dna"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 21804
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/forge-dna run dev"
+
+[services.env]
+PORT = "21804"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/forge-dna", "run", "build"]
+publicDir = "artifacts/forge-dna/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
