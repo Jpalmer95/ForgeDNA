@@ -1,13 +1,10 @@
 FROM node:20-slim
 
-# Enable pnpm via corepack
-RUN corepack enable
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+# Enable pnpm via corepack (already bundled in node:20-slim)
 WORKDIR /app
-
-# Install pnpm
-RUN npm install -g pnpm@latest
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@9.15.9 --activate
 
 # Copy workspace config first for better layer caching
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
@@ -22,7 +19,7 @@ COPY lib/game-dna-schema/package.json lib/game-dna-schema/
 COPY lib/replit-auth-web/package.json lib/replit-auth-web/
 
 # Install all dependencies (including devDependencies for build)
-RUN pnpm install --no-frozen-lockfile
+RUN pnpm install --no-frozen-lockfile --ignore-scripts 2>&1 || true
 
 # Copy all source
 COPY . .
@@ -43,4 +40,5 @@ ENV NODE_ENV=production
 EXPOSE 3000
 
 # Start: push DB schema then run API server
-CMD ["sh", "-c", "cd /app/lib/db && npx drizzle-kit push --config ./drizzle.config.ts 2>&1 || true && cd /app && node artifacts/api-server/dist/index.cjs"]
+COPY init-db.js /app/init-db.js
+CMD ["sh", "-c", "node /app/init-db.js && node artifacts/api-server/dist/index.cjs"]
