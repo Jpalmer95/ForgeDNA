@@ -1,0 +1,147 @@
+{
+  "$schema": "../game_dna.schema.json",
+  "schema_version": "1.0.0",
+
+  "meta": {
+    "title": "Quiet Hollow (HermesForge)",
+    "tagline": "Tend the garden. Heal the forest. Find peace.",
+    "description": "A cozy single-player puzzle-adventure where you play as a tiny forest spirit restoring a forgotten garden. This variant carries a HermesForge environment stack so the harness emits a project with real terrain, water, foliage, and sky.",
+    "genre": ["puzzle", "adventure", "simulation"],
+    "art_style": "hand_painted",
+    "target_platforms": ["pc", "mac"],
+    "player_count": { "min": 1, "max": 1, "mode": "singleplayer" },
+    "rating": "everyone",
+    "tags": ["cozy", "wholesome", "nature", "gardening", "relaxing", "hand-painted", "no-combat"],
+    "inspiration": ["A Short Hike", "Unpacking", "Spiritfarer", "Stardew Valley", "Botany Manor"],
+    "author": "Jonathan Korstad + Hermes"
+  },
+
+  "mechanics": {
+    "movement": {
+      "types": ["walk", "sneak", "climb", "swim", "glide", "hover"],
+      "physics_style": "floaty"
+    },
+    "crafting": {
+      "enabled": true,
+      "professions": ["Gardening", "Potion Brewing", "Decorating"],
+      "gathering_skills": ["Seed Collecting", "Water Gathering", "Mineral Mining"],
+      "complexity": "moderate"
+    },
+    "progression": {
+      "type": "metroidvania",
+      "skill_trees": [
+        { "name": "Growth", "description": "Unlock new plant types and growth abilities.", "node_count_estimate": 20 },
+        { "name": "Friendship", "description": "Deepen bonds with woodland creatures who help solve puzzles.", "node_count_estimate": 12 }
+      ],
+      "respec_available": false
+    },
+    "economy": { "enabled": false }
+  },
+
+  "world": {
+    "scale": "small",
+    "structure": "metroidvania",
+    "day_night_cycle": true,
+    "weather_system": ["clear", "gentle_rain", "morning_fog", "sunshower"],
+    "time_of_day_effects": true,
+    "environments": [
+      {
+        "name": "The Hollow",
+        "type": "forest",
+        "visual_description": "A forgotten garden at the heart of an ancient forest. Moss-covered stone walls, crumbling fountains, overgrown paths. Soft watercolor palette of sage green, dusty rose, warm cream, and soft gold. Dappled sunlight through leaves creates shifting patterns on the ground.",
+        "audio_mood": "Gentle piano melodies, birdsong, rustling leaves, distant water trickling, soft wind chimes.",
+        "min_level": 1,
+        "max_level": 20,
+        "sub_areas": [
+          { "name": "The Overgrown Gate", "description": "Entry area. Learn basic mechanics — clearing paths, planting first seeds, befriending a robin." },
+          { "name": "Sunken Fountain", "description": "Central hub with a broken fountain. Fixing it unlocks water mechanics for puzzles." }
+        ],
+        "resources": ["Moonpetal Seeds", "Dewdrop Crystals", "Moss Fibers", "Sunstone Fragments"],
+        "factions_present": ["The Robin Family", "The Frog Colony", "The Firefly Council"],
+        "ambiance": { "lighting": "Warm golden hour lighting. Soft bloom.", "fog": "Soft morning mist.", "particles": "Floating pollen, falling leaves, firefly lights.", "sky": "Soft watercolor sky visible through tree canopy." }
+      }
+    ]
+  },
+
+  "environment": {
+    "terrain": {
+      "recipe": "rolling_hills",
+      "size_m": 1024,
+      "seed": 7,
+      "amplitude": 18.0,
+      "frequency": 0.004,
+      "biome": "temperate"
+    },
+    "water": [
+      {
+        "recipe": "pond",
+        "at": [24, 0, -16],
+        "radius": 20.0,
+        "wave_height": 0.12,
+        "wave_scale": 0.5,
+        "wave_speed": 0.8
+      },
+      {
+        "recipe": "calm_pool",
+        "at": [-40, 0, 32],
+        "radius": 12.0
+      }
+    ],
+    "foliage": [
+      { "recipe": "pine", "count": 220, "area_m": 300.0, "seed": 7, "min_spacing": 2.4 },
+      { "recipe": "grass", "count": 600, "area_m": 320.0, "seed": 11 },
+      { "recipe": "shrub", "count": 90, "area_m": 280.0, "seed": 13 }
+    ],
+    "sky": { "preset": "golden_hour" }
+  },
+
+  "entities": {
+    "player": {
+      "visual_description": "A tiny translucent spirit — about 6 inches tall — with a leaf-shaped body, glowing core, and trailing wisps of light.",
+      "customization": { "body_types": ["default"], "facial_features": false, "hair_styles": 0, "skin_colors": 8, "equipment_visibility": false },
+      "stats": ["growth_energy", "friendship_level"],
+      "abilities": [
+        { "name": "Plant Seed", "description": "Place a collected seed in fertile soil.", "cooldown_seconds": 0, "resource_cost": "1 growth energy" },
+        { "name": "Sing", "description": "Hum a melody that affects nearby plants and attracts creatures.", "cooldown_seconds": 5, "resource_cost": "none" }
+      ]
+    },
+    "npcs": [
+      { "name": "Robin", "role": "companion", "description": "A friendly robin who carries seeds to hard-to-reach places.", "dialogue_complexity": "simple" }
+    ],
+    "enemies": [],
+    "items": {
+      "rarity_tiers": [ { "name": "Common Seed", "color_hex": "#8B7355", "drop_rate_weight": 60 } ],
+      "equipment_slots": [],
+      "categories": [ { "name": "Seeds", "description": "Plantable seeds.", "examples": ["Moonpetal Seed"] } ]
+    }
+  },
+
+  "assets": {
+    "models_3d": [],
+    "textures": [ { "name": "Watercolor Leaf", "description": "Soft watercolor-style leaf texture.", "tags": ["foliage", "hand-painted"] } ],
+    "animations": [ { "name": "Seed Plant", "description": "Spirit gently places seed.", "tags": ["interaction", "planting"] } ],
+    "audio": {
+      "music": [ { "name": "Hollow Morning", "mood": "peaceful, gentle, hopeful", "description": "Soft solo piano.", "loop": true, "environment": "The Hollow" } ],
+      "sfx": [ { "name": "Seed Plant", "description": "Soft plop followed by a gentle sparkle chime.", "trigger": "Planting a seed" } ],
+      "ambient": [ { "name": "Garden Peace", "description": "Birdsong, gentle breeze, distant water.", "environment": "The Hollow" } ],
+      "voice": []
+    },
+    "vfx": [ { "name": "Growth Sparkle", "description": "Gentle golden sparkles rising from growing plants.", "tags": ["growth", "feedback"] } ]
+  },
+
+  "logic": {
+    "quests": [
+      { "name": "First Bloom", "type": "main_story", "description": "Plant your first seed and watch it grow.", "level_requirement": 1, "steps": [ { "order": 1, "description": "Find a Moonpetal Seed.", "objective_type": "discover" } ], "rewards": { "xp": 100 }, "branching": false }
+    ],
+    "world_events": [],
+    "crafting_recipes": [ { "name": "Moonpetal Brew", "profession": "Potion Brewing", "skill_level_required": 5, "ingredients": [ { "item": "Moonpetal", "quantity": 3 } ], "result": "Growth Accelerant", "result_quantity": 1 } ]
+  },
+
+  "ui": {
+    "style": "Hand-drawn watercolor borders. Soft, rounded UI elements.",
+    "color_palette": { "primary": "#f5f0e8", "secondary": "#d4c5a9", "accent": "#7fb069", "background": "#faf6ef", "text": "#4a4a4a" },
+    "hud_elements": [ { "name": "Seed Pouch", "position": "bottom_right", "description": "Small icon showing currently held seeds." } ],
+    "menus": [ { "name": "Garden Journal", "type": "lore_book", "description": "Watercolor sketchbook." } ],
+    "accessibility": { "colorblind_modes": ["protanopia"], "subtitle_support": true, "remappable_controls": true, "screen_reader_support": true, "font_scaling": true }
+  }
+}

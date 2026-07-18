@@ -29,6 +29,13 @@ DEFAULT_AGENT_CONFIGS: dict[AgentType, AgentConfig] = {
     AgentType.CODE_CRAFTING: AgentConfig(name="Crafting Agent", backend=AgentBackend.SUBPROCESS, command="claude", args_template=["--acp", "--stdio"]),
     AgentType.CODE_UI: AgentConfig(name="UI Agent", backend=AgentBackend.SUBPROCESS, command="claude", args_template=["--acp", "--stdio"]),
     AgentType.CODE_WORLD: AgentConfig(name="World Agent", backend=AgentBackend.SUBPROCESS, command="claude", args_template=["--acp", "--stdio"]),
+    # HermesForge environment agents — deterministic recipe fillers (no LLM
+    # needed at v1). They write filled recipe JSON; the hermes_bridge MCP tools
+    # do the actual scene work. DRY_RUN keeps them as pure file operations.
+    AgentType.CODE_TERRAIN: AgentConfig(name="Terrain Recipe Agent", backend=AgentBackend.DRY_RUN),
+    AgentType.CODE_WATER: AgentConfig(name="Water Recipe Agent", backend=AgentBackend.DRY_RUN),
+    AgentType.CODE_FOLIAGE: AgentConfig(name="Foliage Recipe Agent", backend=AgentBackend.DRY_RUN),
+    AgentType.CODE_SKY: AgentConfig(name="Sky Recipe Agent", backend=AgentBackend.DRY_RUN),
     # Asset agents — default to HF inference
     AgentType.TEXTURE: AgentConfig(name="Texture Agent", backend=AgentBackend.HF, hf_model="stabilityai/stable-diffusion-xl-base-1.0", hf_task="text-to-image"),
     AgentType.AUDIO_MUSIC: AgentConfig(name="Music Agent", backend=AgentBackend.HF, hf_model="facebook/musicgen-medium", hf_task="text-to-audio"),

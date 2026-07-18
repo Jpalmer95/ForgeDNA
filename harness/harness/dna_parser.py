@@ -17,6 +17,7 @@ class GameDNA:
         self.assets = data.get("assets", {})
         self.logic = data.get("logic", {})
         self.ui = data.get("ui", {})
+        self.environment = data.get("environment", {})
 
     @property
     def title(self) -> str:
@@ -32,6 +33,26 @@ class GameDNA:
 
     def environments(self) -> list[dict]:
         return self.world.get("environments", [])
+
+    def env_terrain(self) -> dict:
+        """HermesForge terrain recipe from the environment: block (schema v2)."""
+        return self.environment.get("terrain", {})
+
+    def env_water(self) -> list[dict]:
+        """HermesForge water bodies from the environment: block (schema v2)."""
+        return self.environment.get("water", [])
+
+    def env_foliage(self) -> list[dict]:
+        """HermesForge foliage scatter passes from the environment: block (schema v2)."""
+        return self.environment.get("foliage", [])
+
+    def env_sky(self) -> dict:
+        """HermesForge sky preset from the environment: block (schema v2)."""
+        return self.environment.get("sky", {})
+
+    def has_environment_stack(self) -> bool:
+        """True if this DNA declares a HermesForge environment: block."""
+        return bool(self.environment)
 
     def dungeons(self) -> list[dict]:
         return self.world.get("dungeons", [])

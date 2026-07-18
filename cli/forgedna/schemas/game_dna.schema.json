@@ -36,6 +36,9 @@
     },
     "ui": {
       "$ref": "#/definitions/UI"
+    },
+    "environment": {
+      "$ref": "#/definitions/EnvironmentStack"
     }
   },
   "definitions": {
@@ -118,6 +121,79 @@
           "type": "array",
           "items": { "type": "string" },
           "description": "Games or media that inspire this project."
+        },
+        "author": {
+          "type": "string",
+          "description": "Creator identity (human name, agent ID, or org)."
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 creation timestamp."
+        },
+        "updated_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "ISO 8601 last-modified timestamp."
+        },
+        "license": {
+          "type": "string",
+          "enum": ["cc0", "cc-by", "cc-by-sa", "cc-by-nc", "cc-by-nc-sa", "mit", "apache-2.0", "gpl-3.0", "all-rights-reserved"],
+          "description": "License for this DNA. Default: cc-by-sa."
+        },
+        "lineage": {
+          "$ref": "#/definitions/Lineage"
+        }
+      }
+    },
+
+    "Lineage": {
+      "type": "object",
+      "description": "Remix ancestry tracking. Auto-populated by forgedna remix.",
+      "additionalProperties": false,
+      "properties": {
+        "dna_id": {
+          "type": "string",
+          "description": "Unique UUID for this DNA instance."
+        },
+        "original_id": {
+          "type": "string",
+          "description": "UUID of the very first DNA in the chain (self if original)."
+        },
+        "parent_id": {
+          "type": "string",
+          "description": "UUID of the DNA this was remixed from (null if original)."
+        },
+        "generation": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Remix depth. 0 = original, 1 = first remix, 2 = remix of remix, etc."
+        },
+        "remixed_by": {
+          "type": "string",
+          "description": "Who performed this remix (human name or agent ID)."
+        },
+        "remixed_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this remix was created."
+        },
+        "changes_summary": {
+          "type": "string",
+          "description": "Human/agent-readable summary of what changed in this remix."
+        },
+        "ancestors": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "dna_id": { "type": "string" },
+              "title": { "type": "string" },
+              "author": { "type": "string" },
+              "generation": { "type": "integer" }
+            }
+          },
+          "description": "Full ancestry chain for quick traversal."
         }
       }
     },
@@ -988,6 +1064,98 @@
             "screen_reader_support": { "type": "boolean" },
             "font_scaling": { "type": "boolean" }
           }
+        }
+      }
+    },
+
+    "EnvironmentStack": {
+      "type": "object",
+      "description": "HermesForge environment stack (schema v2). Maps 1:1 to HermesForge module recipes — terrain, water, foliage, sky. When present, the Godot adapter emits a HermesForge-base project and the harness drives these recipes through the hermes_bridge MCP tools. Optional: DNAs without this block build as before.",
+      "additionalProperties": false,
+      "properties": {
+        "terrain": {
+          "type": "object",
+          "description": "Terrain generation recipe (HermesForge terrain module).",
+          "additionalProperties": false,
+          "properties": {
+            "recipe": {
+              "type": "string",
+              "enum": ["rolling_hills", "mountain_range", "island"],
+              "description": "Terrain recipe id from hermesforge/modules/terrain/recipes/."
+            },
+            "size_m": { "type": "integer", "minimum": 128, "maximum": 8192, "default": 1024 },
+            "seed": { "type": "integer", "default": 0 },
+            "amplitude": { "type": "number", "minimum": 2.0, "maximum": 400.0 },
+            "frequency": { "type": "number" },
+            "biome": { "type": "string", "enum": ["temperate", "alpine", "desert"], "default": "temperate" }
+          },
+          "required": ["recipe"]
+        },
+        "water": {
+          "type": "array",
+          "description": "Water bodies (HermesForge water module, Gerstner surface + buoyancy).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "enum": ["lake", "pond", "ocean", "river_spline", "calm_pool"],
+                "description": "Water recipe id from hermesforge/modules/water/recipes/."
+              },
+              "at": {
+                "type": "array",
+                "items": { "type": "number" },
+                "minItems": 3,
+                "maxItems": 3,
+                "description": "World position [x, y, z] of the water body center."
+              },
+              "radius": { "type": "number", "exclusiveMinimum": 0 },
+              "wave_height": { "type": "number" },
+              "wave_scale": { "type": "number" },
+              "wave_speed": { "type": "number" },
+              "float_bodies": {
+                "type": "array",
+                "items": { "type": "string" },
+                "description": "Names of RigidBody3D nodes to register for buoyancy on this water body."
+              }
+            },
+            "required": ["recipe"]
+          }
+        },
+        "foliage": {
+          "type": "array",
+          "description": "Foliage scatter passes (HermesForge foliage module, MultiMesh over terrain-height sampling).",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "recipe": {
+                "type": "string",
+                "enum": ["pine", "jungle", "alpine", "rock", "grass", "shrub"],
+                "description": "Foliage recipe id from hermesforge/modules/foliage/recipes/."
+              },
+              "count": { "type": "integer", "minimum": 1 },
+              "area_m": { "type": "number", "exclusiveMinimum": 0 },
+              "seed": { "type": "integer", "default": 0 },
+              "min_spacing": { "type": "number" },
+              "y_offset": { "type": "number" }
+            },
+            "required": ["recipe"]
+          }
+        },
+        "sky": {
+          "type": "object",
+          "description": "Sky/sun/fog preset (HermesForge sky handler).",
+          "additionalProperties": false,
+          "properties": {
+            "preset": {
+              "type": "string",
+              "enum": ["golden_hour", "midday", "overcast_storm", "clear_night"],
+              "description": "Sky preset id understood by the hermes_bridge sky handler."
+            }
+          },
+          "required": ["preset"]
         }
       }
     }

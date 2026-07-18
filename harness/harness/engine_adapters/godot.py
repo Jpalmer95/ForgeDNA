@@ -1,14 +1,34 @@
 """Godot engine adapter — generates project files, scenes, and scripts."""
 import json
+import os
+import shutil
 from pathlib import Path
 from typing import Any
 
 from ..dna_parser import GameDNA
 from .base import EngineAdapter
 
+# Default location of the HermesForge base template (vendored module stack:
+# Terrain3D + Gaea pre-wired, Jolt as the 3D physics backend). Overridable via
+# HERMESFORGE_TEMPLATE env var for non-standard checkouts.
+_DEFAULT_TEMPLATE = Path.home() / "dev" / "hermesforge" / "templates" / "base"
+
+# The hermes_bridge editor plugin (MCP control socket) ships in the golden-demo
+# template, not the base template. Generated projects get it too so the bridge
+# can apply the environment recipes. Overridable via HERMESFORGE_BRIDGE env var.
+_DEFAULT_BRIDGE = Path.home() / "dev" / "hermesforge" / "templates" / "golden-demo" / "addons" / "hermes_bridge"
+
 
 class GodotAdapter(EngineAdapter):
-    """Generates a complete Godot 4.x project from GameDNA."""
+    """Generates a complete Godot 4.x project from GameDNA.
+
+    v2 (schema v2): when the DNA declares an `environment:` block, the project
+    is emitted on top of the HermesForge base template — vendored module stack
+    pre-wired — plus an `environment/` manifest of filled module recipes that
+    the hermes_bridge MCP tools (or a human) apply to realize terrain, water,
+    foliage, and sky. Without the block it emits the classic self-contained
+    project as before.
+    """
 
     def __init__(self, dna: GameDNA, output_dir: str):
         super().__init__(dna, output_dir)
@@ -19,14 +39,17 @@ class GodotAdapter(EngineAdapter):
         return "godot"
 
     def get_engine_version(self) -> str:
-        return "4.x"
+        return "4.7" if self.dna.has_environment_stack() else "4.x"
 
     def get_supported_features(self) -> list[str]:
-        return [
+        features = [
             "movement", "combat", "crafting", "progression", "economy",
             "day_night", "weather", "quests", "npcs", "enemies",
             "items", "inventory", "dialogue", "skill_trees", "save_system",
         ]
+        if self.dna.has_environment_stack():
+            features += ["terrain", "water", "foliage", "sky"]
+        return features
 
     def get_export_targets(self) -> list[str]:
         return ["pc", "mac", "linux", "web", "android"]
@@ -37,6 +60,217 @@ class GodotAdapter(EngineAdapter):
 
     def generate_all(self) -> dict[str, Any]:
         """Generate the complete Godot project."""
+        if self.dna.has_environment_stack():
+            return self._generate_hermesforge_project()
+        return self._generate_classic_project()
+
+    # ─── v2: HermesForge-base project ───────────────────────────────────────
+
+    def _generate_hermesforge_project(self) -> dict[str, Any]:
+        """Emit a HermesForge-base project with the environment manifest."""
+        files_created: list[str] = []
+
+        # 1. Copy the vendored HermesForge base template (module stack) plus
+        #    the hermes_bridge editor plugin (applies the environment recipes).
+        template = Path(os.environ.get("HERMESFORGE_TEMPLATE", str(_DEFAULT_TEMPLATE)))
+        if self._copy_template(template):
+            files_created.append(f"<template:{template.name}>")
+        bridge_src = Path(os.environ.get("HERMESFORGE_BRIDGE", str(_DEFAULT_BRIDGE)))
+        if self._copy_bridge(bridge_src):
+            files_created.append("addons/hermes_bridge")
+
+        # 2. project.godot: game name + Jolt + module plugins, on top of base.
+        files_created.append(self._write_hermesforge_project_godot())
+
+        # 3. Environment manifest — the filled module recipes + bridge calls.
+        files_created += self._write_environment_manifest()
+
+        # 4. Boot scene + script that reports the environment stack headless.
+        files_created.append(self._write_hermesforge_main_scene())
+
+        return {
+            "engine": "godot",
+            "base": "hermesforge",
+            "project_dir": str(self.project_dir),
+            "files_created": files_created,
+            "total_files": len(files_created),
+            "environment_stack": {
+                "terrain": bool(self.dna.env_terrain()),
+                "water": len(self.dna.env_water()),
+                "foliage": len(self.dna.env_foliage()),
+                "sky": bool(self.dna.env_sky()),
+            },
+        }
+
+    def _copy_template(self, template: Path) -> bool:
+        """Copy the HermesForge base template into the project dir."""
+        if not template.exists():
+            # Template unavailable — emit a manifest-only project that still
+            # records the environment intent (adapter stays usable standalone).
+            return False
+        for item in template.iterdir():
+            dest = self.project_dir / item.name
+            if item.is_dir():
+                if dest.exists():
+                    shutil.rmtree(dest)
+                shutil.copytree(item, dest)
+            else:
+                shutil.copy2(item, dest)
+        return True
+
+    def _copy_bridge(self, bridge_src: Path) -> bool:
+        """Copy the hermes_bridge editor plugin into addons/ (bridge-ready)."""
+        if not bridge_src.exists():
+            return False
+        dest = self.project_dir / "addons" / "hermes_bridge"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        if dest.exists():
+            shutil.rmtree(dest)
+        shutil.copytree(bridge_src, dest)
+        return True
+
+    def _write_hermesforge_project_godot(self) -> str:
+        """project.godot for a HermesForge-base project (Godot 4.7, Jolt, modules)."""
+        title = self.dna.title
+        genre = ", ".join(self.dna.genre)
+
+        content = f"""\
+; Engine configuration file.
+; Generated by ForgeDNA (schema v2) on the HermesForge base template.
+; Module stack pre-wired: Terrain3D + Gaea plugins, Jolt 3D physics.
+; Game: {title} — {genre}
+
+config_version=5
+
+[application]
+
+config/name="{title}"
+config/description="Generated by ForgeDNA on HermesForge — {genre}"
+run/main_scene="res://main.tscn"
+config/features=PackedStringArray("4.7", "Forward Plus")
+
+[editor_plugins]
+
+enabled=PackedStringArray("terrain_3d", "gaea", "hermes_bridge")
+
+[physics]
+
+3d/physics_engine="Jolt Physics"
+
+[rendering]
+
+renderer/rendering_method="forward_plus"
+"""
+        path = self.project_dir / "project.godot"
+        path.write_text(content)
+        return "project.godot"
+
+    def _write_environment_manifest(self) -> list[str]:
+        """Write the filled environment module recipes + bridge application script."""
+        written: list[str] = []
+        env_dir = self.project_dir / "environment"
+        env_dir.mkdir(parents=True, exist_ok=True)
+
+        manifest: dict[str, Any] = {
+            "game": self.dna.title,
+            "generator": "forgedna-harness (schema v2)",
+            "modules": {},
+            "bridge_tools": [],
+        }
+
+        terrain = self.dna.env_terrain()
+        if terrain:
+            manifest["modules"]["terrain"] = terrain
+            manifest["bridge_tools"].append("hermes_terrain_generate")
+        for water in self.dna.env_water():
+            manifest["modules"].setdefault("water", []).append(water)
+            if "hermes_water_create" not in manifest["bridge_tools"]:
+                manifest["bridge_tools"].append("hermes_water_create")
+        for foliage in self.dna.env_foliage():
+            manifest["modules"].setdefault("foliage", []).append(foliage)
+            if "hermes_foliage_scatter" not in manifest["bridge_tools"]:
+                manifest["bridge_tools"].append("hermes_foliage_scatter")
+        sky = self.dna.env_sky()
+        if sky:
+            manifest["modules"]["sky"] = sky
+            manifest["bridge_tools"].append("hermes_sky_set")
+
+        manifest_path = env_dir / "environment.manifest.json"
+        manifest_path.write_text(json.dumps(manifest, indent=2))
+        written.append("environment/environment.manifest.json")
+
+        # Also write per-module filled recipe files (the recipe vocabulary a
+        # human or agent can hand-edit and re-apply).
+        if terrain:
+            p = env_dir / "terrain.recipe.json"
+            p.write_text(json.dumps(self._as_recipe("terrain", terrain), indent=2))
+            written.append("environment/terrain.recipe.json")
+        for i, water in enumerate(self.dna.env_water()):
+            rid = water.get("recipe", f"water_{i}")
+            p = env_dir / f"water.{rid}.recipe.json"
+            p.write_text(json.dumps(self._as_recipe("water", water), indent=2))
+            written.append(f"environment/water.{rid}.recipe.json")
+        for i, foliage in enumerate(self.dna.env_foliage()):
+            rid = foliage.get("recipe", f"foliage_{i}")
+            p = env_dir / f"foliage.{rid}.recipe.json"
+            p.write_text(json.dumps(self._as_recipe("foliage", foliage), indent=2))
+            written.append(f"environment/foliage.{rid}.recipe.json")
+        if sky:
+            p = env_dir / "sky.recipe.json"
+            p.write_text(json.dumps(self._as_recipe("sky", sky), indent=2))
+            written.append("environment/sky.recipe.json")
+
+        return written
+
+    @staticmethod
+    def _as_recipe(module: str, block: dict) -> dict[str, Any]:
+        """Normalize an environment: sub-block into a module recipe document."""
+        recipe_id = block.get("recipe") or block.get("preset") or "custom"
+        return {
+            "module": module,
+            "recipe_id": recipe_id,
+            "params": {k: v for k, v in block.items() if k != "recipe"},
+        }
+
+    def _write_hermesforge_main_scene(self) -> str:
+        """Boot scene + script that reports the environment stack headless."""
+        # Boot script — printed by the QA harness to confirm the stack.
+        summary = {
+            "terrain": self.dna.env_terrain().get("recipe"),
+            "water": [w.get("recipe") for w in self.dna.env_water()],
+            "foliage": [f.get("recipe") for f in self.dna.env_foliage()],
+            "sky": self.dna.env_sky().get("preset"),
+        }
+        script = f'''\
+extends Node3D
+## Boot scene — Generated by ForgeDNA (schema v2) on the HermesForge stack.
+## The environment/ manifest holds the module recipes; apply them via the
+## hermes_bridge MCP tools (hermes_terrain_generate, hermes_water_create,
+## hermes_foliage_scatter, hermes_sky_set) or by hand in the editor.
+
+const ENVIRONMENT_STACK := {json.dumps(summary)}
+
+func _ready() -> void:
+\tprint("ForgeDNA HermesForge project booted OK")
+\tprint("Physics engine: ", ProjectSettings.get_setting("physics/3d/physics_engine", "default"))
+\tprint("Environment stack: ", ENVIRONMENT_STACK)
+'''
+        (self.project_dir / "main.gd").write_text(script)
+
+        scene = '''[gd_scene load_steps=2 format=3 uid="uid://forgedna_hermesforge_main"]
+
+[ext_resource type="Script" path="res://main.gd" id="1"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1")
+'''
+        (self.project_dir / "main.tscn").write_text(scene)
+        return "main.tscn"
+
+    # ─── v1: classic self-contained project ─────────────────────────────────
+
+    def _generate_classic_project(self) -> dict[str, Any]:
+        """Generate the classic (pre-v2) self-contained Godot project."""
         # Create directory structure FIRST
         dirs = ["scenes", "scripts", "assets/textures", "assets/audio/music",
                 "assets/audio/sfx", "assets/audio/ambient", "assets/models"]
@@ -68,6 +302,7 @@ class GodotAdapter(EngineAdapter):
 
         return {
             "engine": "godot",
+            "base": "classic",
             "project_dir": str(self.project_dir),
             "files_created": files_created,
             "total_files": len(files_created),

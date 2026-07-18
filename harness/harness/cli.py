@@ -329,14 +329,15 @@ def build_full(
 
     # Build agent configs
     agent_configs = {}
+    code_types = ["code_player", "code_enemy", "code_combat", "code_quest", "code_crafting", "code_ui", "code_world"]
     if claude:
-        for code_type in ["code_player", "code_enemy", "code_combat", "code_quest", "code_crafting", "code_ui", "code_world"]:
+        for code_type in code_types:
             agent_configs[code_type] = AgentConfig(
                 name="Claude Code", backend=AgentBackend.SUBPROCESS,
                 command="claude", args_template=["--acp", "--stdio"],
             )
     elif api_provider and api_model:
-        for code_type in ["code_player", "code_enemy", "code_combat", "code_quest", "code_crafting", "code_ui", "code_world"]:
+        for code_type in code_types:
             agent_configs[code_type] = AgentConfig(
                 name=f"API ({api_provider})", backend=AgentBackend.API,
                 api_provider=api_provider, api_model=api_model,
