@@ -1,0 +1,27 @@
+# ForgeDNA — robots.txt
+# VR Game Design Platform
+# Homepage: https://forgedna.replit.app
+
+User-agent: *
+Allow: /
+Allow: /schemas
+Allow: /guide
+Allow: /play/
+Allow: /llms.txt
+
+Disallow: /api/auth/
+Disallow: /api/mobile-auth/
+Disallow: /api/login
+Disallow: /api/callback
+Disallow: /api/logout
+
+# AI/LLM agent discovery — machine-readable documentation
+# Full platform docs, API reference, MCP tools, and schema structure:
+LLMsTxt: /llms.txt
+
+# Key pages for indexing:
+# / — Homepage
+# /schemas — Public schema gallery (Databanks)
+# /guide — Build Guide (AI agents, Godot, MCP)
+# /play/:slug — WebXR play pages
+# /api/schemas/game-dna — Canonical GameDNA JSON Schema

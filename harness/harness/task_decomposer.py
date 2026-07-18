@@ -296,6 +296,69 @@ def decompose(dna: GameDNA) -> BuildPlan:
             priority=55,
         ))
 
+    # ─── Phase 3.5: HermesForge Environment Stack (schema v2) ───
+    # When the DNA declares an environment: block, emit one recipe-task per
+    # HermesForge module. These run after scaffolding but before the classic
+    # world-building phase, so the generated project already has terrain /
+    # water / foliage / sky when CODE_WORLD agents flesh out gameplay scenes.
+    env_stack_ids = []
+    terrain_task_id: str | None = None
+    if dna.has_environment_stack():
+        terrain = dna.env_terrain()
+        if terrain:
+            tid = next_id("terrain")
+            terrain_task_id = tid
+            env_stack_ids.append(tid)
+            plan.tasks.append(BuildTask(
+                task_id=tid,
+                agent_type=AgentType.CODE_TERRAIN,
+                name=f"Terrain: {terrain.get('recipe', 'custom')}",
+                description=f"Generate HermesForge terrain from recipe '{terrain.get('recipe')}' ({terrain.get('size_m', 1024)}m, biome={terrain.get('biome', 'temperate')}). Emit the filled recipe JSON and apply via hermes_terrain_generate.",
+                input_data={"module": "terrain", "recipe": terrain},
+                dependencies=[scaffold_id],
+                priority=88,
+            ))
+
+        for water in dna.env_water():
+            wid = next_id("water")
+            env_stack_ids.append(wid)
+            plan.tasks.append(BuildTask(
+                task_id=wid,
+                agent_type=AgentType.CODE_WATER,
+                name=f"Water: {water.get('recipe', 'custom')}",
+                description=f"Create HermesForge water body from recipe '{water.get('recipe')}' at {water.get('at', [0, 0, 0])} (radius={water.get('radius', 48)}). Apply via hermes_water_create; register float_bodies via hermes_water_float_on_water.",
+                input_data={"module": "water", "recipe": water},
+                dependencies=([scaffold_id, terrain_task_id] if terrain_task_id else [scaffold_id]),  # water sits on terrain
+                priority=84,
+            ))
+
+        for foliage in dna.env_foliage():
+            fid = next_id("foliage")
+            env_stack_ids.append(fid)
+            plan.tasks.append(BuildTask(
+                task_id=fid,
+                agent_type=AgentType.CODE_FOLIAGE,
+                name=f"Foliage: {foliage.get('recipe', 'custom')}",
+                description=f"Scatter HermesForge foliage from recipe '{foliage.get('recipe')}' (count={foliage.get('count', 200)}, area={foliage.get('area_m', 200)}m). Apply via hermes_foliage_scatter over the terrain heightfield.",
+                input_data={"module": "foliage", "recipe": foliage},
+                dependencies=([scaffold_id, terrain_task_id] if terrain_task_id else [scaffold_id]),  # foliage samples terrain height
+                priority=82,
+            ))
+
+        sky = dna.env_sky()
+        if sky:
+            sid = next_id("sky")
+            env_stack_ids.append(sid)
+            plan.tasks.append(BuildTask(
+                task_id=sid,
+                agent_type=AgentType.CODE_SKY,
+                name=f"Sky: {sky.get('preset', 'custom')}",
+                description=f"Set HermesForge sky preset '{sky.get('preset')}'. Apply via hermes_sky_set.",
+                input_data={"module": "sky", "recipe": sky},
+                dependencies=[scaffold_id],
+                priority=80,
+            ))
+
     # ─── Phase 4: World Building ───
     world_ids = []
     for env in dna.environments():
@@ -307,7 +370,7 @@ def decompose(dna: GameDNA) -> BuildPlan:
             name=f"Environment: {env['name']}",
             description=f"Build {env.get('type', 'unknown')} environment: {env.get('visual_description', '')[:100]}",
             input_data=env,
-            dependencies=[scaffold_id] + core_ids,
+            dependencies=[scaffold_id] + core_ids + env_stack_ids,
             priority=80,
         ))
 
@@ -396,7 +459,7 @@ def decompose(dna: GameDNA) -> BuildPlan:
         ))
 
     # ─── Phase 10: Integration & Assembly ───
-    all_content_ids = asset_ids + world_ids + dungeon_ids + enemy_ids + quest_ids
+    all_content_ids = asset_ids + env_stack_ids + world_ids + dungeon_ids + enemy_ids + quest_ids
 
     integration_id = next_id("integration")
     plan.tasks.append(BuildTask(
@@ -440,6 +503,7 @@ def decompose(dna: GameDNA) -> BuildPlan:
         {"name": "Scaffolding", "tasks": [scaffold_id]},
         {"name": "Core Systems", "tasks": core_ids},
         {"name": "Asset Generation", "tasks": asset_ids},
+        {"name": "Environment Stack", "tasks": env_stack_ids},
         {"name": "World Building", "tasks": world_ids},
         {"name": "Dungeons", "tasks": dungeon_ids},
         {"name": "Enemies", "tasks": enemy_ids},

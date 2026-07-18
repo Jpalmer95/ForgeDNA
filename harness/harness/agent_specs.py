@@ -20,6 +20,10 @@ class AgentType(str, Enum):
     CODE_CRAFTING = "code_crafting"
     CODE_UI = "code_ui"
     CODE_WORLD = "code_world"
+    CODE_TERRAIN = "code_terrain"
+    CODE_WATER = "code_water"
+    CODE_FOLIAGE = "code_foliage"
+    CODE_SKY = "code_sky"
     ASSEMBLY = "assembly"
     TEST = "test"
 
@@ -173,6 +177,46 @@ AGENT_REGISTRY: dict[AgentType, AgentSpec] = {
         models_required=["qwen-2.5-72b-instruct"],
         can_parallelize=True,
         max_instances=3,
+    ),
+    # ─── HermesForge environment agents (schema v2) ───
+    # These emit HermesForge module recipes, not raw scenes. Their output is a
+    # filled recipe JSON + the bridge tool call needed to realize it in the
+    # generated HermesForge-base project.
+    AgentType.CODE_TERRAIN: AgentSpec(
+        agent_type=AgentType.CODE_TERRAIN,
+        name="Terrain Recipe Agent",
+        description="Fills a HermesForge terrain recipe (rolling_hills / mountain_range / island) from the DNA environment block and drives hermes_terrain_generate through the bridge.",
+        tools_required=["hermesforge_mcp", "filesystem"],
+        models_required=["qwen-2.5-72b-instruct"],
+        can_parallelize=False,
+        max_instances=1,
+    ),
+    AgentType.CODE_WATER: AgentSpec(
+        agent_type=AgentType.CODE_WATER,
+        name="Water Recipe Agent",
+        description="Fills HermesForge water recipes (lake / pond / ocean / river_spline / calm_pool) incl. buoyancy float_bodies, and drives hermes_water_create / hermes_water_float_on_water.",
+        tools_required=["hermesforge_mcp", "filesystem"],
+        models_required=["qwen-2.5-72b-instruct"],
+        can_parallelize=True,
+        max_instances=2,
+    ),
+    AgentType.CODE_FOLIAGE: AgentSpec(
+        agent_type=AgentType.CODE_FOLIAGE,
+        name="Foliage Recipe Agent",
+        description="Fills HermesForge foliage scatter recipes (pine / jungle / alpine / rock / grass / shrub) and drives hermes_foliage_scatter.",
+        tools_required=["hermesforge_mcp", "filesystem"],
+        models_required=["qwen-2.5-72b-instruct"],
+        can_parallelize=True,
+        max_instances=2,
+    ),
+    AgentType.CODE_SKY: AgentSpec(
+        agent_type=AgentType.CODE_SKY,
+        name="Sky Preset Agent",
+        description="Selects the HermesForge sky preset (golden_hour / midday / overcast_storm / clear_night) from the DNA ambiance and drives hermes_sky_set.",
+        tools_required=["hermesforge_mcp", "filesystem"],
+        models_required=["qwen-2.5-72b-instruct"],
+        can_parallelize=False,
+        max_instances=1,
     ),
     AgentType.ASSEMBLY: AgentSpec(
         agent_type=AgentType.ASSEMBLY,

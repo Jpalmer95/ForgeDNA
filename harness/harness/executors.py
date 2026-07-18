@@ -278,6 +278,78 @@ class WorldCodeExecutor(CodeExecutor):
         }
 
 
+# ─── HermesForge Environment Recipe Executors (schema v2) ───
+#
+# These are deliberately deterministic at v1: the DNA environment: block IS
+# the intent, already expressed in HermesForge recipe vocabulary. The executor
+# normalizes/validates the params against the module recipe schema, writes the
+# filled recipe JSON into the build output, and records which hermes_bridge
+# MCP tool the adapter/agent should call to realize it. An LLM agent can be
+# layered on top later (e.g. to derive params from prose), but is NOT required
+# to produce a correct, verifiable environment.
+
+class _HermesForgeRecipeExecutor(AgentExecutor):
+    """Base for HermesForge module recipe executors."""
+
+    module: str = ""           # terrain | water | foliage | sky
+    bridge_tool: str = ""      # hermes_<module>_<op> tool id
+
+    def _fill_recipe(self, task: BuildTask) -> dict[str, Any]:
+        recipe = task.input_data.get("recipe", {})
+        recipe_id = recipe.get("recipe") or recipe.get("preset") or "custom"
+        return {
+            "module": self.module,
+            "recipe_id": recipe_id,
+            "params": {k: v for k, v in recipe.items() if k != "recipe"},
+            "bridge_tool": self.bridge_tool,
+            "source_task": task.task_id,
+        }
+
+    def execute(self, task: BuildTask) -> dict[str, Any]:
+        filled = self._fill_recipe(task)
+        recipe_id = filled["recipe_id"]
+
+        out_dir = self.output_dir / "environment" / self.module
+        out_dir.mkdir(parents=True, exist_ok=True)
+        out_path = out_dir / f"{recipe_id}.recipe.json"
+        out_path.write_text(json.dumps(filled, indent=2))
+
+        return {
+            "success": True,
+            "task_id": task.task_id,
+            "output_path": str(out_path),
+            "output_files": [str(out_path)],
+            "module": self.module,
+            "recipe_id": recipe_id,
+            "bridge_tool": self.bridge_tool,
+            "type": "hermesforge_recipe",
+        }
+
+
+class TerrainRecipeExecutor(_HermesForgeRecipeExecutor):
+    """Fills the HermesForge terrain recipe (rolling_hills / mountain_range / island)."""
+    module = "terrain"
+    bridge_tool = "hermes_terrain_generate"
+
+
+class WaterRecipeExecutor(_HermesForgeRecipeExecutor):
+    """Fills a HermesForge water recipe (lake / pond / ocean / river_spline / calm_pool)."""
+    module = "water"
+    bridge_tool = "hermes_water_create"
+
+
+class FoliageRecipeExecutor(_HermesForgeRecipeExecutor):
+    """Fills a HermesForge foliage scatter recipe (pine / jungle / alpine / rock / grass / shrub)."""
+    module = "foliage"
+    bridge_tool = "hermes_foliage_scatter"
+
+
+class SkyRecipeExecutor(_HermesForgeRecipeExecutor):
+    """Selects the HermesForge sky preset (golden_hour / midday / overcast_storm / clear_night)."""
+    module = "sky"
+    bridge_tool = "hermes_sky_set"
+
+
 # ─── Executor Registry ───
 
 EXECUTOR_REGISTRY: dict[AgentType, type[AgentExecutor]] = {
@@ -292,6 +364,10 @@ EXECUTOR_REGISTRY: dict[AgentType, type[AgentExecutor]] = {
     AgentType.CODE_QUEST: QuestCodeExecutor,
     AgentType.CODE_UI: UICodeExecutor,
     AgentType.CODE_WORLD: WorldCodeExecutor,
+    AgentType.CODE_TERRAIN: TerrainRecipeExecutor,
+    AgentType.CODE_WATER: WaterRecipeExecutor,
+    AgentType.CODE_FOLIAGE: FoliageRecipeExecutor,
+    AgentType.CODE_SKY: SkyRecipeExecutor,
 }
 
 

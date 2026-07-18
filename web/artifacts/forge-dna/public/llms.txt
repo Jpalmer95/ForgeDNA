@@ -1,0 +1,203 @@
+# ForgeDNA — llms.txt
+# AI Agent & LLM Integration Reference
+# Last updated: 2025
+# Homepage: https://forgedna.replit.app
+
+## PLATFORM OVERVIEW
+
+ForgeDNA is a text-first VR game design platform. Creators design, remix, share,
+and manage VR game blueprints as structured JSON documents called "GameDNA."
+The platform serves as a community hub and schema workbench — actual game
+compilation and generation happens on external infrastructure using AI agents
+and game engines like Godot.
+
+GameDNA schemas are engine-agnostic, human-readable, and AI-friendly. They
+describe everything about a VR game: environment physics, player rig, entities,
+game logic, levels, and audio.
+
+## HOW TO USE THE PLATFORM
+
+### Web Interface
+- Homepage: / — Platform overview, featured schemas, quick-start
+- Databanks (Gallery): /schemas — Browse, search, filter, star, and fork public schemas
+- Schema Editor: /schemas/:id/edit — 8-tab visual editor for GameDNA schemas
+- Schema Detail: /schemas/:id — View schema details, extract JSON, fork
+- Build Guide: /guide — Comprehensive implementation guide for AI agents and Godot
+- WebXR Play: /play/:slug — Play a schema in WebXR directly in browser
+
+### Core Workflows
+1. CREATE a new schema from scratch or from a genre template
+2. EDIT using the 8-tab editor (Meta, Environment, Player Rig, Entities, Logic, Levels, Audio, JSON)
+3. GENERATE a Godot 4.x project using the built-in deterministic generator or AI agent swarm
+4. EXPORT the GameDNA JSON to feed into your own AI agent pipeline
+5. SHARE by making schemas public, allowing others to fork and remix
+6. PLAY via WebXR preview or export to VR headsets
+
+### Genre Templates
+Pre-built starting points available when creating new schemas:
+- Survival Sandbox
+- Puzzle Platformer
+- Horror Escape Room
+- Space Exploration
+- Combat Arena
+- Social Hub
+
+## GAMEDNA SCHEMA STRUCTURE
+
+Every GameDNA schema is organized into 7 top-level sections ("pillars"):
+
+### 1. meta
+Game metadata: title, description, slug, genre, target platforms, version.
+
+### 2. environment_config
+World settings: physics (gravity vector, drag), lighting (type, color, intensity,
+shadows), skybox, fog, post-processing effects, world boundaries.
+
+### 3. player_rig
+VR player configuration: height, movement (locomotion type, speed, jump, snap-turn),
+hand interaction (grab distance, haptic feedback), comfort settings (vignette,
+teleport), collision shape.
+
+### 4. entity_registry
+Array of game entities. Each entity has:
+- id: Unique string identifier
+- label: Display name
+- mesh: 3D model reference (primitive or path)
+- transform: Position, rotation, scale
+- physics: Body type, mass, collision shape
+- tags: Categorization array
+- scripts: Attached behavior scripts
+- components: Additional data components
+
+### 5. logic_recipes
+Game logic definitions as event-driven recipes:
+- id: Recipe identifier
+- label: Human-readable name
+- trigger: Event that activates the recipe (collision, timer, input, proximity)
+- conditions: Array of conditions that must be true
+- actions: Array of actions to execute (spawn, destroy, modify, teleport, play_sound)
+- target_entity_id: Which entity this recipe applies to
+
+### 6. levels
+Level/scene definitions:
+- id: Level identifier
+- label: Display name
+- spawn_point: Player spawn position and rotation
+- entity_ids: Array of entity IDs placed in this level
+- environment_overrides: Per-level environment setting overrides
+
+### 7. audio
+Audio configuration:
+- music_tracks: Background music definitions
+- sfx_library: Sound effect definitions with trigger mappings
+- spatial_audio: 3D audio settings
+- ambient: Ambient sound layers
+
+## API REFERENCE
+
+Base URL: /api
+
+### Health
+GET /api/healthz — Health check, returns server status
+
+### Authentication
+GET /api/auth/user — Get the currently authenticated user
+GET /api/login — Start browser OIDC login flow (redirects)
+GET /api/callback — OIDC callback handler
+GET /api/logout — Clear session and logout
+POST /api/mobile-auth/token-exchange — Exchange mobile OIDC code for session
+POST /api/mobile-auth/logout — Delete mobile session token
+
+### GameDNA Schemas
+GET /api/schemas — List public schemas (supports query params: search, genre, sort, limit, offset)
+POST /api/schemas — Create a new schema (auth required, body: title, description, schema JSON)
+GET /api/schemas/game-dna — Get the canonical GameDNA JSON Schema contract
+GET /api/schemas/mine — List current user's schemas (auth required)
+GET /api/schemas/:id — Get a single schema by ID
+PUT /api/schemas/:id — Update a schema (auth required, owner only)
+DELETE /api/schemas/:id — Delete a schema (auth required, owner only)
+
+### Schema Social Features
+POST /api/schemas/:id/fork — Fork a public schema (auth required)
+POST /api/schemas/:id/star — Star/bookmark a schema (auth required)
+DELETE /api/schemas/:id/star — Remove star from a schema (auth required)
+
+### Schema Versioning
+GET /api/schemas/:id/versions — List version history for a schema
+POST /api/schemas/:id/versions/restore — Restore to a previous version (auth required, body: versionId)
+
+### Godot Project Generation (Deterministic)
+POST /api/parse — Generate a Godot 4.x project ZIP from GameDNA JSON (body: schema JSON)
+GET /api/parse/status/:jobId — Poll generation job status
+GET /api/parse/download/:jobId — Download generated Godot project ZIP
+
+### AI Agent Build (AI-Powered Generation)
+POST /api/ai-build — Start AI-powered Godot build using agent swarm (auth required, body: schemaId)
+GET /api/ai-build/stream/:jobId — Stream agent build logs via Server-Sent Events (SSE)
+GET /api/ai-build/status/:jobId — Poll AI build job status
+GET /api/ai-build/download/:jobId — Download AI-generated Godot project ZIP
+
+### Cloud Build (Simulated)
+POST /api/cloud-build — Queue a cloud Godot export build (auth required)
+GET /api/cloud-build/:buildId — Get cloud build status
+
+### WebXR Play
+GET /api/play/:slug — Get play/WebXR data for a schema by its slug
+
+## MCP (MODEL CONTEXT PROTOCOL) TOOLS
+
+ForgeDNA's AI agent pipeline uses three MCP tools for iterative game generation:
+
+### Tool: read_game_dna
+Read a specific section of the GameDNA schema JSON.
+Parameters:
+  - section (string, required): One of "meta", "environment_config", "player_rig",
+    "entity_registry", "logic_recipes", "levels", "audio", "full"
+Returns: The requested section of the schema as JSON.
+
+### Tool: write_gdscript
+Write a GDScript (.gd) file to the Godot project.
+Parameters:
+  - file_path (string, required): Relative path, e.g. "scripts/player_locomotion.gd"
+  - content (string, required): Full GDScript source code
+  - description (string, required): Brief description of what this script does
+  - target_entity_id (string, required): Entity ID from entity_registry to attach to
+  - node_type (string, optional): Godot node type — one of "Node", "Node3D", "Area3D",
+    "CharacterBody3D", "RigidBody3D", "StaticBody3D". Defaults to "Node".
+  - attach_mode (string, optional): "root" (attach to entity root node) or "child"
+    (create new child node). Defaults to "child".
+
+### Tool: write_tscn
+Write a Godot scene (.tscn) file to the project.
+Parameters:
+  - file_path (string, required): Relative path, e.g. "scenes/craft_station.tscn"
+  - content (string, required): Full Godot text scene file content
+  - description (string, required): Brief description of what this scene contains
+
+### Agent Loop Pattern
+1. Read the "meta" section to understand the game concept
+2. Read "environment_config" to set up the world
+3. Read "player_rig" to configure VR player
+4. Read "entity_registry" to enumerate all game entities
+5. For each entity, write_tscn to create its scene file
+6. Read "logic_recipes" and write_gdscript for each recipe's behavior
+7. Read "levels" to set up level scenes
+8. Read "audio" to configure sound
+9. Self-validate by re-reading schema and comparing against generated files
+
+## KEY LINKS
+
+- Platform Home: /
+- Schema Gallery (Databanks): /schemas
+- Build Guide: /guide
+- GameDNA JSON Schema Contract: /api/schemas/game-dna
+- WebXR Play: /play/:slug (replace :slug with a schema's slug)
+
+## SUPPORT THE CREATOR
+
+ForgeDNA is built and maintained by a solo developer. If you find it useful,
+consider supporting the project:
+
+- Buy Me a Coffee: https://buymeacoffee.com/Jkorstad
+- MyDoge: https://mydoge.com/JonK
+- Base/ETH Wallet: 0x0Ba2D788A7D3E944a849052e872CE3976fda396A

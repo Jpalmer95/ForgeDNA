@@ -1,0 +1,14 @@
+packages:
+  "framer-motion": "For fluid, cyberpunk-style page transitions and staggered entrance animations"
+  "date-fns": "For formatting schema creation dates"
+  "clsx": "For conditional class joining"
+  "tailwind-merge": "For merging Tailwind utility classes safely"
+
+images:
+  - path: "artifacts/forge-dna/public/images/cyber-grid.png"
+    description: "Abstract dark cyberpunk grid with glowing cyan and magenta data lines on deep black background, technical wireframe aesthetic, no text."
+    aspect_ratio: "16:9"
+
+notes:
+  - "Using generated hooks from @workspace/api-client-react as specified in the monorepo setup."
+  - "Using local UI components matching the cyberpunk aesthetic."
