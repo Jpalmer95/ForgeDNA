@@ -322,6 +322,8 @@ def build_full(
     api_provider: str = typer.Option("", "--api-provider", help="API provider (openai, anthropic)"),
     api_model: str = typer.Option("", "--api-model", help="API model name"),
     api_key_env: str = typer.Option("", "--api-key-env", help="Env var with API key"),
+    apply: bool = typer.Option(False, "--apply", help="After generating, realize the environment headless (Phase 3.5, needs Godot)"),
+    godot: str = typer.Option("", "--godot", help="Path to Godot binary for --apply (else $GODOT_BIN or PATH)"),
 ):
     """Full build pipeline: DNA → Tasks → Agents → Engine Project → Playable Game."""
     from .agents.build_manager import BuildManager, BuildConfig, AgentConfig, AgentBackend
@@ -402,13 +404,75 @@ def build_full(
         table.add_row(f"... and {engine_result['total_files'] - 20} more")
     console.print(table)
 
+    # Phase 3 (optional): realize the environment headless — build→world with
+    # no editor session. Only meaningful for HermesForge-base projects (DNA
+    # with an environment: block); apply_environment explains otherwise.
+    if apply:
+        console.print("\n[bold cyan]━━━ Phase 3: Environment Apply (headless) ━━━[/bold cyan]")
+        from .environment_apply import apply_environment
+        res = apply_environment(engine_result["project_dir"], godot=godot)
+        if res["success"]:
+            console.print(Panel(
+                f"[bold green]Environment realized![/bold green]\n\n"
+                f"Applied {len(res['applied'])} ops:\n  • " + "\n  • ".join(res["applied"]) +
+                f"\n\nWorld saved to main.tscn.",
+                title="🌍 Build → World"
+            ))
+        else:
+            console.print(Panel(
+                f"[bold red]Environment apply failed[/bold red] (rc={res['returncode']})\n\n"
+                f"{res['log'][-1500:]}",
+                title="⚠ Apply Failed"
+            ))
+
+    open_hint = f"godot --path {engine_result['project_dir']}"
+    if apply:
+        open_hint += "   # world already realized — just open & play"
+    else:
+        open_hint += f"\n# or realize the environment first:\n# godot --headless --path {engine_result['project_dir']} --script res://environment_apply.gd"
+
     console.print(Panel(
         f"[bold green]Build Complete![/bold green]\n\n"
         f"Project: {engine_result['project_dir']}\n"
         f"Open in Godot 4.x to play!\n\n"
-        f"[dim]godot --path {engine_result['project_dir']}",
+        f"[dim]{open_hint}",
         title="🎮 Ready to Play"
     ))
+
+
+@app.command()
+def apply_environment(
+    project_dir: Path = typer.Argument(..., help="Path to a generated HermesForge Godot project", exists=True),
+    godot: str = typer.Option("", "--godot", help="Path to Godot binary (else $GODOT_BIN or PATH)"),
+    timeout: int = typer.Option(180, "--timeout", help="Max seconds for the headless apply"),
+):
+    """Realize a generated project's environment headless (Phase 3.5).
+
+    Runs environment_apply.gd: reads environment/environment.manifest.json,
+    drives terrain/water/foliage/sky through the hermes_bridge socket, saves the
+    world to main.tscn, and verifies it. No editor session needed.
+    """
+    from .environment_apply import apply_environment as _apply
+
+    console.print(Panel(
+        f"[bold]{project_dir}[/bold]\nRealizing environment headless…",
+        title="[bold cyan]Environment Apply"
+    ))
+    res = _apply(str(project_dir), godot=godot, timeout=timeout)
+
+    if res["success"]:
+        console.print(Panel(
+            f"[bold green]Environment realized![/bold green]\n\n"
+            f"Applied {len(res['applied'])} ops:\n  • " + "\n  • ".join(res["applied"]) +
+            f"\n\nWorld saved to main.tscn. Open & play:\n[dim]godot --path {project_dir}",
+            title="🌍 Build → World"
+        ))
+    else:
+        console.print(Panel(
+            f"[bold red]Environment apply failed[/bold red] (rc={res['returncode']})\n\n{res['log'][-2000:]}",
+            title="⚠ Apply Failed"
+        ))
+        raise typer.Exit(1)
 
 
 @app.command()
